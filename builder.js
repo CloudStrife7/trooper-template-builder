@@ -17,49 +17,49 @@ const COSTUME_PRESETS = {
     paintNames: { primary: "Imperial White", secondary: "Joint Black", tertiary: "Corps Blue" }
   },
   "darth-vader": {
-    name: "Darth Vader", detachment: "Sith Lord", prefix: "DV", icon: "psychology",
+    name: "Darth Vader", detachment: "Sith Lord Detachment", prefix: "SL", icon: "psychology",
     primary: "#1A1A2E", secondary: "#8B0000", tertiary: "#C0C0C0",
     paintCodes: null,
     paintNames: { primary: "Obsidian", secondary: "Sith Red", tertiary: "Imperial Chrome" }
   },
   "shoretrooper": {
-    name: "Shoretrooper", detachment: "Stormtrooper", prefix: "TK", icon: "beach_access",
+    name: "Shoretrooper", detachment: "PathFinders", prefix: "ST", icon: "beach_access",
     primary: "#C4956A", secondary: "#3D5A3E", tertiary: "#8B7355",
     paintCodes: null,
     paintNames: { primary: "Scarif Sand", secondary: "Trooper Olive", tertiary: "Dune" }
   },
   "scout-trooper": {
-    name: "Scout Trooper", detachment: "Stormtrooper", prefix: "BK", icon: "two_wheeler",
+    name: "Scout Trooper", detachment: "PathFinders", prefix: "TB", icon: "two_wheeler",
     primary: "#D0D0D0", secondary: "#2C2C2C", tertiary: "#6B8E23",
     paintCodes: null,
     paintNames: { primary: "Shell White", secondary: "Visor Black", tertiary: "Endor" }
   },
   "tie-pilot": {
-    name: "TIE Pilot", detachment: "Starfighter", prefix: "TP", icon: "flight",
+    name: "TIE Pilot", detachment: "Jolly Roger Squadron", prefix: "TI", icon: "flight",
     primary: "#1C1C1C", secondary: "#4169E1", tertiary: "#808080",
     paintCodes: null,
     paintNames: { primary: "Void Black", secondary: "Imperial Navy", tertiary: "Hull Gray" }
   },
   "royal-guard": {
-    name: "Emperor's Royal Guard", detachment: "Imperial Officer", prefix: "RG", icon: "security",
+    name: "Emperor's Royal Guard", detachment: "Sovereign Protectors", prefix: "TR", icon: "security",
     primary: "#8B0000", secondary: "#2C0000", tertiary: "#808080",
     paintCodes: null,
     paintNames: { primary: "Royal Crimson", secondary: "Shadow Maroon", tertiary: "Imperial Gray" }
   },
   "death-trooper": {
-    name: "Death Trooper", detachment: "Stormtrooper", prefix: "DT", icon: "skull",
+    name: "Death Trooper", detachment: "Spec Ops", prefix: "TX", icon: "skull",
     primary: "#0D0D0D", secondary: "#1A472A", tertiary: "#2F4F2F",
     paintCodes: null,
     paintNames: { primary: "Death Black", secondary: "Specter Green", tertiary: "Shadow Green" }
   },
   "shadow-trooper": {
-    name: "Shadow Stormtrooper", detachment: "Stormtrooper", prefix: "SH", icon: "visibility_off",
+    name: "Shadow Stormtrooper", detachment: "Spec Ops", prefix: "TX", icon: "visibility_off",
     primary: "#1A1A1A", secondary: "#333333", tertiary: "#505050",
     paintCodes: null,
     paintNames: { primary: "Shadow Black", secondary: "Stealth Gray", tertiary: "Phantom" }
   },
   "mandalorian": {
-    name: "The Mandalorian", detachment: "Bounty Hunters Guild", prefix: "MN", icon: "shield",
+    name: "The Mandalorian", detachment: "Bounty Hunters Guild", prefix: "BH", icon: "shield",
     primary: "#6B7B8D", secondary: "#4A3728", tertiary: "#8B7D6B",
     paintCodes: null,
     paintNames: { primary: "Beskar", secondary: "Mudhorn Brown", tertiary: "Dune Sand" }
@@ -71,7 +71,7 @@ const COSTUME_PRESETS = {
     paintNames: { primary: "Clone White", secondary: "501st Blue", tertiary: "Torrent" }
   },
   "tusken-raider": {
-    name: "Tusken Raider", detachment: "Bounty Hunters Guild", prefix: "TS", icon: "landscape",
+    name: "Tusken Raider", detachment: "Krayt Clan", prefix: "DZ", icon: "landscape",
     primary: "#8B7355", secondary: "#5C4033", tertiary: "#C4A882",
     paintCodes: null,
     paintNames: { primary: "Dune", secondary: "Bantha Hide", tertiary: "Tatooine Sand" }
@@ -120,7 +120,7 @@ const builderState = {
   includeTour: true, includeArmory: true,
   images: { hero: null, profile: null, suited: null },
   buildPhotos: [], // Array of { id, label, image: null }
-  troops: [] // Array of { id, date, name, location, notes, status: 'complete'|'upcoming' }
+  troops: [] // Array of { id, date, name, location, notes, photo, status: 'complete'|'upcoming' }
 };
 
 // --- Step Navigation ---
@@ -506,6 +506,7 @@ function addTroop(data) {
     name: (data && data.name) || '',
     location: (data && data.location) || '',
     notes: (data && data.notes) || '',
+    photo: (data && data.photo) || '',
     status: (data && data.status) || 'complete'
   };
   builderState.troops.push(entry);
@@ -553,6 +554,11 @@ function renderTroopSlot(entry) {
       </div>
     </div>
     <div>
+      <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Photo URL (Optional)</label>
+      <input type="text" value="${escHtml(entry.photo)}" data-troop-field="${entry.id}-photo" placeholder="e.g. https://i.imgur.com/your-troop-photo.jpg"
+        class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
+    </div>
+    <div>
       <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Notes (Optional)</label>
       <input type="text" value="${escHtml(entry.notes)}" data-troop-field="${entry.id}-notes" placeholder="Short description of the event"
         class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
@@ -570,6 +576,7 @@ function renderTroopSlot(entry) {
     input.addEventListener('change', handler);
     input.addEventListener('input', handler);
   });
+
 }
 
 function removeTroop(id) {
@@ -1030,11 +1037,13 @@ function generateTour(forZip) {
 
   // Build timeline entries for upcoming missions
   const upcomingHtml = upcomingTroops.map(t => {
+    const photoSrc = t.photo || '';
     return `<div class="relative flex flex-col md:flex-row items-start md:items-center">
 <div class="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
 <div class="font-label text-xs text-secondary tracking-widest font-bold mb-1">NEXT DEPLOYMENT</div>
 <h3 class="font-headline text-2xl font-bold uppercase leading-tight">${escHtml(t.name || 'Upcoming Mission')}</h3>
 <p class="font-body text-outline text-sm mt-1">${escHtml(t.location || 'Location TBD')}</p>
+${photoSrc ? `<img src="${photoSrc}" alt="${escHtml(t.name || 'Troop photo')}" class="mt-3 rounded-lg max-h-48 object-cover"/>` : ''}
 </div>
 <div class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-secondary border-4 border-background transform -translate-x-1/2 z-[1]"></div>
 <div class="md:w-1/2 md:pl-12 pl-12">
@@ -1050,6 +1059,7 @@ ${t.notes ? `<p class="font-body text-on-surface-variant text-sm mt-1">${escHtml
 
   // Build timeline entries for completed missions (newest first)
   const completedHtml = completedTroops.slice().reverse().map(t => {
+    const photoSrc = t.photo || '';
     return `<div class="relative flex flex-col md:flex-row items-start md:items-center opacity-60 hover:opacity-100 transition-all duration-500 p-4 -m-4 rounded-lg">
 <div class="absolute left-4 md:left-1/2 w-3 h-3 rounded-full bg-outline-variant border-2 border-background transform -translate-x-1/2 z-[1]"></div>
 <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 pl-12 md:pl-0">
@@ -1064,6 +1074,7 @@ ${t.notes ? `<p class="font-body text-on-surface-variant text-sm mt-1">${escHtml
 <h3 class="font-headline text-2xl font-bold uppercase leading-tight">${escHtml(t.name || 'Mission')}</h3>
 <p class="font-body text-outline text-sm mt-1">${escHtml(t.location || '')}</p>
 ${t.notes ? `<p class="font-body text-on-surface-variant text-sm mt-1">${escHtml(t.notes)}</p>` : ''}
+${photoSrc ? `<img src="${photoSrc}" alt="${escHtml(t.name || 'Troop photo')}" class="mt-3 rounded-lg max-h-48 object-cover"/>` : ''}
 </div>
 </div>`;
   }).join('\n');
@@ -1544,7 +1555,7 @@ function buildSiteConfig() {
     garrison: s.garrison, detachment: s.detachment, squad: s.squad, rank: s.rank,
     bio: s.bio, troopsCompleted: s.troopsCompleted, yearsActive: s.yearsActive, sector: s.sector,
     includeTour: s.includeTour, includeArmory: s.includeArmory,
-    troops: s.troops.map(t => ({ date: t.date, name: t.name, location: t.location, notes: t.notes, status: t.status })),
+    troops: s.troops.map(t => ({ date: t.date, name: t.name, location: t.location, notes: t.notes, photo: t.photo, status: t.status })),
     buildPhotoLabels: s.buildPhotos.map(bp => bp.label),
     // Note: images are stored as files in the ZIP, not in the config JSON (too large for base64)
   };
@@ -1682,32 +1693,20 @@ function generateBBCode() {
   bb += '\n\n';
 
   // Troop log
-  if (completedTroops.length > 0 || upcomingTroops.length > 0) {
+  const allTroops = [...completedTroops.slice().reverse(), ...upcomingTroops];
+  if (allTroops.length > 0) {
     bb += '[b][size=120]Tour of Duty[/size][/b]\n\n';
-  }
-
-  if (upcomingTroops.length > 0) {
-    bb += '[b]Upcoming Deployments:[/b]\n';
-    upcomingTroops.forEach(t => {
-      bb += '• ' + (t.name || 'Upcoming Mission');
-      if (t.date) bb += ' — ' + t.date;
-      if (t.location) bb += ' (' + t.location + ')';
-      if (t.notes) bb += ' — ' + t.notes;
+    allTroops.forEach((t, i) => {
+      bb += '[b]Troop #' + (i + 1) + '[/b]\n';
+      bb += '[b]Date:[/b] ' + (t.date || 'TBD') + '\n';
+      bb += '[b]Name of the event:[/b] ' + (t.name || 'TBD') + '\n';
+      if (t.photo) {
+        bb += '[b]Photo:[/b] [img]' + t.photo + '[/img]\n';
+      } else {
+        bb += '[b]Photo:[/b] N/A\n';
+      }
       bb += '\n';
     });
-    bb += '\n';
-  }
-
-  if (completedTroops.length > 0) {
-    bb += '[b]Completed Missions:[/b]\n';
-    completedTroops.slice().reverse().forEach(t => {
-      bb += '[color=green]✓[/color] ' + (t.name || 'Mission');
-      if (t.date) bb += ' — ' + t.date;
-      if (t.location) bb += ' (' + t.location + ')';
-      if (t.notes) bb += ' — ' + t.notes;
-      bb += '\n';
-    });
-    bb += '\n';
   }
 
   // Images — include Imgur URLs if provided
