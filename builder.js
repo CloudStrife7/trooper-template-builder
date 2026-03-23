@@ -116,7 +116,7 @@ const builderState = {
   paintCodes: null,
   siteName: '', designation: '', characterFirstName: '', characterLastName: '',
   garrison: '', detachment: '', squad: '', rank: '',
-  bio: '', troopsCompleted: '', yearsActive: '', sector: '', ghPagesUrl: '',
+  bio: '', troopsCompleted: '', yearsActive: '', sector: '',
   includeTour: true, includeArmory: true,
   images: { hero: null, profile: null, suited: null },
   buildPhotos: [], // Array of { id, label, image: null }
@@ -300,7 +300,6 @@ function collectStep2() {
   builderState.troopsCompleted = document.getElementById('input-troops')?.value || '0';
   builderState.yearsActive = document.getElementById('input-years')?.value || '1';
   builderState.sector = document.getElementById('input-sector')?.value || '--';
-  builderState.ghPagesUrl = (document.getElementById('input-ghpages')?.value || '').replace(/\/+$/, '');
   builderState.includeTour = document.getElementById('toggle-tour')?.checked ?? true;
   builderState.includeArmory = document.getElementById('toggle-armory')?.checked ?? true;
 }
@@ -507,7 +506,7 @@ function addTroop(data) {
     name: (data && data.name) || '',
     location: (data && data.location) || '',
     notes: (data && data.notes) || '',
-    photo: (data && data.photo) || null,
+    photo: (data && data.photo) || '',
     status: (data && data.status) || 'complete'
   };
   builderState.troops.push(entry);
@@ -555,15 +554,9 @@ function renderTroopSlot(entry) {
       </div>
     </div>
     <div>
-      <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Troop Photo (Optional)</label>
-      <div id="drop-${entry.id}-photo" class="w-full h-32 border-2 border-dashed border-outline-variant/30 rounded-lg flex items-center justify-center cursor-pointer hover:border-tertiary transition-colors overflow-hidden">
-        <div class="text-center">
-          <span class="material-symbols-outlined text-outline text-2xl">add_photo_alternate</span>
-          <div class="font-label text-[10px] text-outline uppercase tracking-wider mt-1">Drop or click to upload</div>
-        </div>
-      </div>
-      <input type="text" data-troop-photo-url="${entry.id}" placeholder="Or paste an image URL"
-        class="w-full mt-2 bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
+      <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Photo URL (Optional)</label>
+      <input type="text" value="${escHtml(entry.photo)}" data-troop-field="${entry.id}-photo" placeholder="e.g. https://i.imgur.com/your-troop-photo.jpg"
+        class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
     </div>
     <div>
       <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Notes (Optional)</label>
@@ -584,75 +577,6 @@ function renderTroopSlot(entry) {
     input.addEventListener('input', handler);
   });
 
-  // Wire up troop photo drop zone
-  const photoDropZone = div.querySelector('#drop-' + entry.id + '-photo');
-  if (photoDropZone) {
-    photoDropZone.addEventListener('dragover', e => { e.preventDefault(); photoDropZone.classList.add('border-tertiary'); });
-    photoDropZone.addEventListener('dragleave', () => photoDropZone.classList.remove('border-tertiary'));
-    photoDropZone.addEventListener('drop', e => {
-      e.preventDefault();
-      photoDropZone.classList.remove('border-tertiary');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) handleTroopPhoto(entry, file, photoDropZone);
-    });
-    photoDropZone.addEventListener('click', () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.onchange = () => { if (input.files[0]) handleTroopPhoto(entry, input.files[0], photoDropZone); };
-      input.click();
-    });
-
-    // Restore preview if photo already exists
-    if (entry.photo && entry.photo.type === 'file') {
-      showTroopPhotoPreview(photoDropZone, entry.photo.dataUrl);
-    } else if (entry.photo && entry.photo.type === 'url') {
-      showTroopPhotoPreview(photoDropZone, entry.photo.url);
-    }
-  }
-
-  // Wire up troop photo URL input
-  const photoUrlInput = div.querySelector('[data-troop-photo-url="' + entry.id + '"]');
-  if (photoUrlInput) {
-    photoUrlInput.addEventListener('change', () => {
-      const url = photoUrlInput.value.trim();
-      if (url) {
-        entry.photo = { type: 'url', url };
-        if (photoDropZone) showTroopPhotoPreview(photoDropZone, url);
-      }
-    });
-  }
-}
-
-function handleTroopPhoto(entry, file, dropZone) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      const MAX_W = 1920;
-      if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      entry.photo = { type: 'file', dataUrl, filename: entry.id + '-photo.jpg' };
-      showTroopPhotoPreview(dropZone, dataUrl);
-    };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function showTroopPhotoPreview(dropZone, src) {
-  dropZone.innerHTML = `
-    <img src="${src}" class="w-full h-full object-cover rounded" alt="Troop Photo"/>
-    <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity rounded">
-      <span class="font-label text-xs text-white uppercase tracking-wider">Click to Replace</span>
-    </div>
-  `;
-  dropZone.classList.add('relative');
 }
 
 function removeTroop(id) {
@@ -1113,7 +1037,7 @@ function generateTour(forZip) {
 
   // Build timeline entries for upcoming missions
   const upcomingHtml = upcomingTroops.map(t => {
-    const photoSrc = t.photo ? (t.photo.type === 'url' ? t.photo.url : (forZip ? 'public/images/' + t.photo.filename : t.photo.dataUrl)) : '';
+    const photoSrc = t.photo || '';
     return `<div class="relative flex flex-col md:flex-row items-start md:items-center">
 <div class="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
 <div class="font-label text-xs text-secondary tracking-widest font-bold mb-1">NEXT DEPLOYMENT</div>
@@ -1135,7 +1059,7 @@ ${t.notes ? `<p class="font-body text-on-surface-variant text-sm mt-1">${escHtml
 
   // Build timeline entries for completed missions (newest first)
   const completedHtml = completedTroops.slice().reverse().map(t => {
-    const photoSrc = t.photo ? (t.photo.type === 'url' ? t.photo.url : (forZip ? 'public/images/' + t.photo.filename : t.photo.dataUrl)) : '';
+    const photoSrc = t.photo || '';
     return `<div class="relative flex flex-col md:flex-row items-start md:items-center opacity-60 hover:opacity-100 transition-all duration-500 p-4 -m-4 rounded-lg">
 <div class="absolute left-4 md:left-1/2 w-3 h-3 rounded-full bg-outline-variant border-2 border-background transform -translate-x-1/2 z-[1]"></div>
 <div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 pl-12 md:pl-0">
@@ -1579,14 +1503,6 @@ async function downloadSite() {
       }
     }
 
-    // Add troop photos
-    for (const troop of builderState.troops) {
-      if (troop.photo && troop.photo.type === 'file') {
-        const base64 = troop.photo.dataUrl.split(',')[1];
-        imgFolder.file(troop.photo.filename, base64, { base64: true });
-      }
-    }
-
     // Generate dark placeholders for any missing images
     const allSlots = ['hero', 'profile', 'suited'];
     // Also add build photo slots
@@ -1637,9 +1553,9 @@ function buildSiteConfig() {
     siteName: s.siteName, designation: s.designation,
     characterFirstName: s.characterFirstName, characterLastName: s.characterLastName,
     garrison: s.garrison, detachment: s.detachment, squad: s.squad, rank: s.rank,
-    bio: s.bio, troopsCompleted: s.troopsCompleted, yearsActive: s.yearsActive, sector: s.sector, ghPagesUrl: s.ghPagesUrl,
+    bio: s.bio, troopsCompleted: s.troopsCompleted, yearsActive: s.yearsActive, sector: s.sector,
     includeTour: s.includeTour, includeArmory: s.includeArmory,
-    troops: s.troops.map(t => ({ date: t.date, name: t.name, location: t.location, notes: t.notes, photo: t.photo && t.photo.type === 'url' ? t.photo : null, status: t.status })),
+    troops: s.troops.map(t => ({ date: t.date, name: t.name, location: t.location, notes: t.notes, photo: t.photo, status: t.status })),
     buildPhotoLabels: s.buildPhotos.map(bp => bp.label),
     // Note: images are stored as files in the ZIP, not in the config JSON (too large for base64)
   };
@@ -1676,7 +1592,7 @@ function loadSiteConfig(configJson) {
       'input-garrison': 'garrison', 'input-detachment': 'detachment',
       'input-squad': 'squad', 'input-rank': 'rank',
       'input-bio': 'bio', 'input-troops': 'troopsCompleted',
-      'input-years': 'yearsActive', 'input-sector': 'sector', 'input-ghpages': 'ghPagesUrl'
+      'input-years': 'yearsActive', 'input-sector': 'sector'
     };
     for (const [elId, key] of Object.entries(fieldMap)) {
       const el = document.getElementById(elId);
@@ -1784,12 +1700,8 @@ function generateBBCode() {
       bb += '[b]Troop #' + (i + 1) + '[/b]\n';
       bb += '[b]Date:[/b] ' + (t.date || 'TBD') + '\n';
       bb += '[b]Name of the event:[/b] ' + (t.name || 'TBD') + '\n';
-      if (t.photo && t.photo.type === 'url') {
-        bb += '[b]Photo:[/b] [img]' + t.photo.url + '[/img]\n';
-      } else if (t.photo && t.photo.type === 'file' && s.ghPagesUrl) {
-        bb += '[b]Photo:[/b] [img]' + s.ghPagesUrl + '/public/images/' + t.photo.filename + '[/img]\n';
-      } else if (t.photo && t.photo.type === 'file') {
-        bb += '[b]Photo:[/b] (uploaded — set your GitHub Pages URL to auto-generate this link)\n';
+      if (t.photo) {
+        bb += '[b]Photo:[/b] [img]' + t.photo + '[/img]\n';
       } else {
         bb += '[b]Photo:[/b] N/A\n';
       }
