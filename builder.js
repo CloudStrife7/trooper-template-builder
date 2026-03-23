@@ -118,7 +118,8 @@ const builderState = {
   garrison: '', detachment: '', squad: '', rank: '',
   bio: '', troopsCompleted: '', yearsActive: '', sector: '',
   includeTour: true, includeArmory: true,
-  images: { hero: null, profile: null, feature1: null, feature2: null, feature3: null }
+  images: { hero: null, profile: null, suited: null },
+  buildPhotos: [] // Array of { id, label, image: null }
 };
 
 // --- Step Navigation ---
@@ -304,7 +305,7 @@ function collectStep2() {
 
 // --- Step 3: Images ---
 function setupImageSlots() {
-  ['hero', 'profile', 'feature1', 'feature2', 'feature3'].forEach(slot => {
+  ['hero', 'profile', 'suited'].forEach(slot => {
     const dropZone = document.getElementById('drop-' + slot);
     const urlInput = document.getElementById('url-' + slot);
     if (!dropZone) return;
@@ -332,10 +333,7 @@ function setupImageSlots() {
     if (urlInput) {
       urlInput.addEventListener('change', () => {
         const url = urlInput.value.trim();
-        if (url) {
-          builderState.images[slot] = { type: 'url', url };
-          showImagePreview(slot, url);
-        }
+        if (url) handleImageUrl(slot, url);
       });
     }
   });
@@ -355,12 +353,31 @@ function handleImageFile(slot, file) {
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      builderState.images[slot] = { type: 'file', dataUrl, filename: slot + '.jpg' };
+      const imgData = { type: 'file', dataUrl, filename: slot + '.jpg' };
+
+      // Check if this is a build photo slot
+      if (slot.startsWith('build-')) {
+        const bp = builderState.buildPhotos.find(b => b.id === slot);
+        if (bp) bp.image = imgData;
+      } else {
+        builderState.images[slot] = imgData;
+      }
       showImagePreview(slot, dataUrl);
     };
     img.src = reader.result;
   };
   reader.readAsDataURL(file);
+}
+
+function handleImageUrl(slot, url) {
+  const imgData = { type: 'url', url };
+  if (slot.startsWith('build-')) {
+    const bp = builderState.buildPhotos.find(b => b.id === slot);
+    if (bp) bp.image = imgData;
+  } else {
+    builderState.images[slot] = imgData;
+  }
+  showImagePreview(slot, url);
 }
 
 function showImagePreview(slot, src) {
@@ -379,11 +396,117 @@ function collectStep3() {
   // Images already collected via event handlers
 }
 
+// --- Build Photo Management ---
+let buildPhotoCounter = 0;
+
+const DEFAULT_BUILD_LABELS = [
+  'Kit Arrival / Unboxing',
+  'Build in Progress',
+  'Final Result / Suited Up'
+];
+
+function initBuildPhotos() {
+  DEFAULT_BUILD_LABELS.forEach(label => {
+    addBuildPhoto(label);
+  });
+  updateBuildJourneyVisibility();
+}
+
+function addBuildPhoto(label) {
+  buildPhotoCounter++;
+  const id = 'build-' + buildPhotoCounter;
+  const photoEntry = { id, label: label || 'Build Photo ' + buildPhotoCounter, image: null };
+  builderState.buildPhotos.push(photoEntry);
+  renderBuildPhotoSlot(photoEntry);
+}
+
+function renderBuildPhotoSlot(entry) {
+  const grid = document.getElementById('build-photos-grid');
+  if (!grid) return;
+
+  const div = document.createElement('div');
+  div.id = 'build-slot-' + entry.id;
+  div.innerHTML = `
+    <div class="flex items-center justify-between mb-2">
+      <input type="text" value="${escHtml(entry.label)}" data-build-label="${entry.id}"
+        class="font-label text-[10px] text-outline uppercase tracking-widest bg-transparent border-none outline-none focus:text-on-surface w-full" placeholder="Photo label"/>
+      <button onclick="removeBuildPhoto('${entry.id}')" class="text-outline hover:text-red-400 transition-colors ml-2 flex-shrink-0" title="Remove">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+    <div id="drop-${entry.id}" class="relative border-2 border-dashed border-outline-variant/40 rounded-lg h-36 flex flex-col items-center justify-center cursor-pointer hover:border-tertiary transition-colors">
+      <span class="material-symbols-outlined text-2xl text-outline mb-1">construction</span>
+      <span class="font-label text-[10px] text-outline uppercase tracking-wider">Drop or click</span>
+    </div>
+    <div class="mt-2">
+      <input id="url-${entry.id}" type="text" placeholder="Imgur URL..."
+        class="w-full bg-surface-container-low border border-outline-variant/30 rounded px-3 py-1.5 text-sm text-on-surface font-body focus:border-tertiary outline-none"/>
+    </div>
+  `;
+  grid.appendChild(div);
+
+  // Wire up events for this slot
+  const dropZone = document.getElementById('drop-' + entry.id);
+  const urlInput = document.getElementById('url-' + entry.id);
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-tertiary'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-tertiary'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('border-tertiary');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) handleImageFile(entry.id, file);
+  });
+  dropZone.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => { if (input.files[0]) handleImageFile(entry.id, input.files[0]); };
+    input.click();
+  });
+  if (urlInput) {
+    urlInput.addEventListener('change', () => {
+      const url = urlInput.value.trim();
+      if (url) handleImageUrl(entry.id, url);
+    });
+  }
+
+  // Update label on input
+  const labelInput = div.querySelector('[data-build-label]');
+  if (labelInput) {
+    labelInput.addEventListener('change', () => {
+      entry.label = labelInput.value || 'Build Photo';
+    });
+  }
+}
+
+function removeBuildPhoto(id) {
+  builderState.buildPhotos = builderState.buildPhotos.filter(b => b.id !== id);
+  const slot = document.getElementById('build-slot-' + id);
+  if (slot) slot.remove();
+}
+
+function updateBuildJourneyVisibility() {
+  const section = document.getElementById('build-journey-section');
+  if (section) {
+    const armoryChecked = document.getElementById('toggle-armory')?.checked ?? true;
+    section.classList.toggle('hidden', !armoryChecked);
+  }
+}
+
 // --- Image URL resolver for templates ---
 function getImageSrc(slot, forZip) {
+  // Check build photos first
+  if (slot.startsWith('build-')) {
+    const bp = builderState.buildPhotos.find(b => b.id === slot);
+    const img = bp?.image;
+    if (!img) return forZip ? ('public/images/' + slot + '.jpg') : '';
+    if (img.type === 'url') return img.url;
+    if (img.type === 'file') return forZip ? ('public/images/' + img.filename) : img.dataUrl;
+    return '';
+  }
   const img = builderState.images[slot];
   if (!img) {
-    // For ZIP, reference the placeholder that will be generated
     return forZip ? ('public/images/' + slot + '.jpg') : '';
   }
   if (img.type === 'url') return img.url;
@@ -880,12 +1003,69 @@ ${nav.bottomNav}
 function generateArmory(forZip) {
   const s = builderState;
   const osv = deriveOnSurfaceVariant(s.primary);
-  const feat1 = getImageSrc('feature1', forZip);
-  const feat2 = getImageSrc('feature2', forZip);
-  const feat3 = getImageSrc('feature3', forZip);
+  const suitedSrc = getImageSrc('suited', forZip);
   const nav = navFragment('armory.html', forZip);
   const pn = s.paintNames;
   const pc = s.paintCodes;
+
+  // Build the journey cards from build photos
+  const colorCycle = [s.primary, s.tertiary, s.secondary];
+  const journeyCards = s.buildPhotos.map((bp, i) => {
+    const imgSrc = getImageSrc(bp.id, forZip);
+    const accent = colorCycle[i % colorCycle.length];
+    // Alternate layout: first is large (7 cols), second is medium (5 cols), rest are equal (4 cols)
+    let colSpan, minH;
+    if (i === 0) { colSpan = 'md:col-span-7'; minH = 'min-h-[320px] md:min-h-[400px]'; }
+    else if (i === 1) { colSpan = 'md:col-span-5'; minH = 'min-h-[280px] md:min-h-[400px]'; }
+    else { colSpan = 'md:col-span-4'; minH = 'min-h-[280px]'; }
+
+    return `<div class="${colSpan} relative overflow-hidden group cursor-default ${minH}">
+<img alt="${escHtml(bp.label)}" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" loading="lazy" src="${imgSrc}"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 md:p-8 z-10">
+<span class="font-label text-[10px] text-[${accent}] tracking-[0.3em] uppercase block mb-2">Phase ${String(i + 1).padStart(2, '0')}</span>
+<h3 class="font-headline text-lg md:text-2xl font-bold uppercase leading-tight mb-2">${escHtml(bp.label)}</h3>
+</div>
+</div>`;
+  }).join('\n');
+
+  // Group journey cards into rows: first 2 in a 12-col row, rest in groups of 3
+  let journeyHtml = '';
+  if (s.buildPhotos.length > 0) {
+    const firstTwo = s.buildPhotos.slice(0, 2);
+    const rest = s.buildPhotos.slice(2);
+    const firstTwoCards = firstTwo.map((bp, i) => {
+      const imgSrc = getImageSrc(bp.id, forZip);
+      const accent = colorCycle[i % colorCycle.length];
+      const colSpan = i === 0 ? 'md:col-span-7' : 'md:col-span-5';
+      return `<div class="${colSpan} relative overflow-hidden group cursor-default min-h-[280px] md:min-h-[400px]">
+<img alt="${escHtml(bp.label)}" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" loading="lazy" src="${imgSrc}"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 md:p-8 z-10">
+<span class="font-label text-[10px] text-[${accent}] tracking-[0.3em] uppercase block mb-2">Phase ${String(i + 1).padStart(2, '0')}</span>
+<h3 class="font-headline text-lg md:text-2xl font-bold uppercase leading-tight mb-2">${escHtml(bp.label)}</h3>
+</div>
+</div>`;
+    }).join('\n');
+
+    journeyHtml += `<div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">\n${firstTwoCards}\n</div>`;
+
+    if (rest.length > 0) {
+      const restCards = rest.map((bp, i) => {
+        const imgSrc = getImageSrc(bp.id, forZip);
+        const accent = colorCycle[(i + 2) % colorCycle.length];
+        return `<div class="relative overflow-hidden group cursor-default min-h-[280px]">
+<img alt="${escHtml(bp.label)}" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700" loading="lazy" src="${imgSrc}"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 z-10">
+<span class="font-label text-[10px] text-[${accent}] tracking-[0.3em] uppercase block mb-2">Phase ${String(i + 3).padStart(2, '0')}</span>
+<h3 class="font-headline text-lg font-bold uppercase leading-tight mb-2">${escHtml(bp.label)}</h3>
+</div>
+</div>`;
+      }).join('\n');
+      journeyHtml += `<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">\n${restCards}\n</div>`;
+    }
+  }
 
   return `${headFragment('The Armory | ' + s.siteName, 'The Armory — build details for ' + s.designation + '.', forZip)}
 ${styleFragment(getImageSrc('hero', forZip), forZip)}
@@ -901,7 +1081,7 @@ ${nav.topNav}
 <span class="font-label text-xs tracking-[0.3em] text-primary uppercase mb-4 block">Protocol Designation: ${escHtml(s.designation)}</span>
 <h1 class="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter leading-none mb-8">THE <span class="text-outline">ARMORY</span>.</h1>
 <p class="font-body text-lg text-on-surface-variant max-w-xl leading-relaxed">
-Your build story goes here. Describe your costume build journey, materials used, and what makes your kit special.
+The build journey for ${escHtml(s.designation)}. From unboxing to approval — every step documented.
 </p>
 </div>
 <div class="w-full md:w-1/3 flex justify-end">
@@ -912,45 +1092,30 @@ Your build story goes here. Describe your costume build journey, materials used,
 </div>
 </div>
 </section>
-<!-- The Build -->
+${s.buildPhotos.length > 0 ? `<!-- The Journey -->
 <section class="mb-32">
 <div class="flex items-center gap-4 mb-12">
-<h2 class="font-headline text-3xl font-bold uppercase tracking-tight">The Build</h2>
+<h2 class="font-headline text-3xl font-bold uppercase tracking-tight">The Journey</h2>
 <div class="h-[2px] flex-grow bg-surface-container-high"></div>
+<span class="font-label text-[10px] text-outline">BUILD LOG: ${escHtml(s.designation)}</span>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[600px]">
-<div class="md:col-span-8 bg-surface-container-lowest overflow-hidden relative group">
-<img alt="Build photo" class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" loading="lazy" src="${feat1}"/>
-<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-80"></div>
-<div class="absolute bottom-8 left-8">
-<h3 class="font-headline text-2xl font-bold mb-2">Your Build</h3>
-<p class="font-body text-sm text-on-surface-variant max-w-md">Describe your build process, techniques, and materials here.</p>
-</div>
-</div>
-<div class="md:col-span-4 grid grid-rows-2 gap-6">
-<div class="bg-surface-container-high p-8 flex flex-col justify-between border-t border-primary/20">
-<span class="material-symbols-outlined text-tertiary text-4xl">construction</span>
-<div>
-<h4 class="font-headline font-bold mb-2">Materials</h4>
-<ul class="font-label text-[10px] space-y-2 uppercase tracking-widest text-on-surface-variant">
-<li>&bull; Your material 1</li>
-<li>&bull; Your material 2</li>
-<li>&bull; Your material 3</li>
-</ul>
-</div>
-</div>
-<div class="bg-surface-container-lowest overflow-hidden relative border-b border-tertiary/20">
-<img alt="Detail photo" class="w-full h-full object-cover opacity-40" loading="lazy" src="${feat2}"/>
-<div class="absolute inset-0 flex items-center justify-center">
-<div class="text-center">
-<span class="font-label text-[10px] tracking-[0.4em] uppercase text-tertiary">Precision Fit</span>
-<div class="text-4xl font-headline font-black mt-2">1:1 SCALE</div>
+${journeyHtml}
+${suitedSrc ? `<!-- Final Result -->
+<div class="relative overflow-hidden group cursor-default min-h-[240px] border-b-2 border-tertiary/30">
+<img alt="Final result — suited up" class="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-700 object-top" loading="lazy" src="${suitedSrc}"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
+<div class="absolute inset-0 flex items-center z-10 px-8 md:px-16">
+<div class="max-w-lg">
+<span class="font-label text-[10px] text-tertiary tracking-[0.3em] uppercase block mb-3">Complete</span>
+<h3 class="font-headline text-3xl md:text-4xl font-extrabold uppercase leading-none tracking-tighter mb-4">501st <span class="text-outline">Approved</span>.</h3>
+<div class="mt-4 inline-flex items-center gap-2 bg-tertiary/10 text-tertiary px-4 py-2 border border-tertiary/30">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label text-[10px] uppercase font-bold tracking-widest">${escHtml(s.designation)} &middot; ${escHtml(s.detachment)}</span>
 </div>
 </div>
 </div>
-</div>
-</div>
-</section>
+</div>` : ''}
+</section>` : ''}
 <!-- The Kit -->
 <section class="mb-24">
 <div class="flex items-center gap-4 mb-12">
@@ -959,7 +1124,7 @@ Your build story goes here. Describe your costume build journey, materials used,
 </div>
 <div class="relative rounded-xl overflow-hidden py-20 px-8 md:px-16">
 <div class="absolute inset-0 z-0">
-<img alt="Kit overview" class="w-full h-full object-cover opacity-20" loading="lazy" src="${feat3}"/>
+${suitedSrc ? `<img alt="Kit overview" class="w-full h-full object-cover opacity-20" loading="lazy" src="${suitedSrc}"/>` : ''}
 </div>
 <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
 <div class="backdrop-blur-xl bg-surface-container-high/40 p-8 rounded-lg border border-outline-variant/20 hover:border-primary/40 transition-colors">
@@ -1182,7 +1347,7 @@ async function downloadSite() {
     if (builderState.includeArmory) zip.file('armory.html', generateArmory(true));
     zip.file('swipe-nav.js', generateSwipeNav(true));
 
-    // Add images
+    // Add site images
     const imgFolder = zip.folder('public').folder('images');
     for (const [slot, imgData] of Object.entries(builderState.images)) {
       if (imgData && imgData.type === 'file') {
@@ -1191,10 +1356,23 @@ async function downloadSite() {
       }
     }
 
+    // Add build journey photos
+    for (const bp of builderState.buildPhotos) {
+      if (bp.image && bp.image.type === 'file') {
+        const base64 = bp.image.dataUrl.split(',')[1];
+        imgFolder.file(bp.image.filename, base64, { base64: true });
+      }
+    }
+
     // Generate dark placeholders for any missing images
-    const allSlots = ['hero', 'profile', 'feature1', 'feature2', 'feature3'];
+    const allSlots = ['hero', 'profile', 'suited'];
+    // Also add build photo slots
+    builderState.buildPhotos.forEach(bp => { if (!bp.image) allSlots.push(bp.id); });
     for (const slot of allSlots) {
-      if (!builderState.images[slot]) {
+      const hasImage = slot.startsWith('build-')
+        ? builderState.buildPhotos.find(b => b.id === slot)?.image
+        : builderState.images[slot];
+      if (!hasImage) {
         const c = document.createElement('canvas');
         c.width = slot === 'hero' ? 1920 : 800;
         c.height = slot === 'hero' ? 1080 : 800;
@@ -1228,5 +1406,11 @@ async function downloadSite() {
 document.addEventListener('DOMContentLoaded', () => {
   renderCostumeGrid();
   setupImageSlots();
+  initBuildPhotos();
   showStep(1);
+  // Toggle build journey section visibility when armory checkbox changes
+  const armoryToggle = document.getElementById('toggle-armory');
+  if (armoryToggle) {
+    armoryToggle.addEventListener('change', updateBuildJourneyVisibility);
+  }
 });
