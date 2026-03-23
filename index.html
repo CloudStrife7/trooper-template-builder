@@ -53,6 +53,10 @@ input[type="color"]::-webkit-color-swatch { border: 1px solid #444840; border-ra
 Trooper Builder
 </a>
 <div class="flex items-center gap-4">
+<button onclick="triggerLoadConfig()" class="flex items-center gap-1.5 px-3 py-1.5 border border-outline-variant/40 rounded-lg hover:border-tertiary transition-colors group" title="Load a previous site-config.json to continue editing">
+<span class="material-symbols-outlined text-sm text-outline group-hover:text-tertiary transition-colors">upload_file</span>
+<span class="font-label text-[10px] text-outline uppercase tracking-wider group-hover:text-tertiary transition-colors hidden sm:inline">Load Config</span>
+</button>
 <div id="color-preview" class="flex gap-1.5"></div>
 <span class="font-label text-[10px] text-outline uppercase tracking-widest hidden md:block">Template Builder</span>
 </div>
@@ -161,6 +165,20 @@ Next <span class="material-symbols-outlined text-sm">arrow_forward</span>
 <div class="mb-8">
 <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Bio / About You</label>
 <textarea id="input-bio" rows="4" placeholder="A proud member of the 501st Legion..." class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors resize-y"></textarea>
+</div>
+<!-- Troops / Missions -->
+<div class="mb-8">
+<div class="flex items-center gap-4 mb-4">
+<span class="font-label text-[10px] text-outline uppercase tracking-[0.3em]">Tour of Duty — Missions</span>
+<div class="h-[1px] flex-grow bg-outline-variant/40"></div>
+<span id="troop-count-display" class="font-label text-[10px] text-outline uppercase tracking-widest">0 missions logged</span>
+</div>
+<p class="font-body text-xs text-on-surface-variant mb-4">Add your troops and events here. These will populate your Tour of Duty page and forum post.</p>
+<div id="troops-list" class="space-y-3 mb-4"></div>
+<button onclick="addTroop()" class="w-full border-2 border-dashed border-outline-variant/30 rounded-lg py-3 flex items-center justify-center gap-2 hover:border-tertiary transition-colors group">
+<span class="material-symbols-outlined text-outline group-hover:text-tertiary transition-colors">add_circle</span>
+<span class="font-label text-xs text-outline uppercase tracking-wider group-hover:text-tertiary transition-colors">Add a Troop / Mission</span>
+</button>
 </div>
 <!-- Page Toggles -->
 <div class="flex flex-wrap gap-8 mb-10 p-6 bg-surface-container-low rounded-lg border border-outline-variant/20">
@@ -297,6 +315,22 @@ Preview <span class="material-symbols-outlined text-sm">arrow_forward</span>
 <span class="material-symbols-outlined">download</span>
 Download Site
 </button>
+</div>
+</div>
+<!-- Forum Post (BBCode) -->
+<div class="bg-surface-container-low rounded-lg p-8 border border-outline-variant/20 mb-8">
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-4">
+<div>
+<h3 class="font-headline text-xl font-bold uppercase mb-2">Forum Post</h3>
+<p class="font-body text-sm text-on-surface-variant">Auto-generated BBCode for your forum thread. Copy and paste into your Bounty Hunters Guild or detachment forum.</p>
+</div>
+<button id="copy-bbcode-btn" onclick="copyBBCode()" class="bg-secondary text-white px-8 py-4 rounded-lg font-headline font-bold uppercase tracking-wider hover:opacity-90 transition-all flex items-center gap-3 whitespace-nowrap">
+<span class="material-symbols-outlined">content_copy</span>
+Copy Forum Post
+</button>
+</div>
+<div class="bg-background rounded border border-outline-variant/30 p-4 max-h-60 overflow-y-auto">
+<pre id="bbcode-preview" class="font-body text-xs text-on-surface-variant whitespace-pre-wrap break-words"></pre>
 </div>
 </div>
 <!-- Deploy Instructions -->
