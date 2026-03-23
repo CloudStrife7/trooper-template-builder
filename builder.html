@@ -13,9 +13,9 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        "primary": "#4C6043",
-        "secondary": "#6D0827",
-        "tertiary": "#F59E01",
+        "primary": "var(--color-primary, #B0B0B0)",
+        "secondary": "var(--color-secondary, #1A1A1A)",
+        "tertiary": "var(--color-tertiary, #4A90D9)",
         "background": "#131411",
         "surface": "#131411",
         "surface-container-low": "#1b1c19",
@@ -23,7 +23,7 @@ tailwind.config = {
         "surface-container-highest": "#353534",
         "surface-bright": "#393939",
         "on-surface": "#e4e2de",
-        "on-surface-variant": "#b7cda9",
+        "on-surface-variant": "var(--color-on-surface-variant, #c8c8c8)",
         "outline": "#8e9288",
         "outline-variant": "#444840"
       },
@@ -38,8 +38,17 @@ tailwind.config = {
 }
 </script>
 <style>
+:root {
+  --color-primary: #B0B0B0;
+  --color-secondary: #1A1A1A;
+  --color-tertiary: #4A90D9;
+  --color-on-surface-variant: #c8c8c8;
+}
 .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
 body { background-color: #131411; color: #e4e2de; font-family: 'Inter', sans-serif; }
+*, *::before, *::after {
+  transition: color 0.5s ease, background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, outline-color 0.5s ease;
+}
 input[type="color"] { -webkit-appearance: none; border: none; }
 input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
 input[type="color"]::-webkit-color-swatch { border: 1px solid #444840; border-radius: 4px; }
@@ -434,7 +443,7 @@ Troubleshooting
 </main>
 
 <!-- Footer -->
-<footer class="bg-[#0d0f0c] w-full py-8 border-t border-secondary/30 mt-auto">
+<footer class="bg-[#0d0f0c] w-full py-8 border-t border-outline-variant/30 mt-auto">
 <div class="flex flex-col items-center gap-3 px-8">
 <div class="font-['Plus_Jakarta_Sans'] text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/40">
 Trooper Template Builder
