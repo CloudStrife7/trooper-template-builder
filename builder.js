@@ -17,49 +17,49 @@ const COSTUME_PRESETS = {
     paintNames: { primary: "Imperial White", secondary: "Joint Black", tertiary: "Corps Blue" }
   },
   "darth-vader": {
-    name: "Darth Vader", detachment: "Sith Lord", prefix: "DV", icon: "psychology",
+    name: "Darth Vader", detachment: "Sith Lord Detachment", prefix: "SL", icon: "psychology",
     primary: "#1A1A2E", secondary: "#8B0000", tertiary: "#C0C0C0",
     paintCodes: null,
     paintNames: { primary: "Obsidian", secondary: "Sith Red", tertiary: "Imperial Chrome" }
   },
   "shoretrooper": {
-    name: "Shoretrooper", detachment: "Stormtrooper", prefix: "TK", icon: "beach_access",
+    name: "Shoretrooper", detachment: "PathFinders", prefix: "ST", icon: "beach_access",
     primary: "#C4956A", secondary: "#3D5A3E", tertiary: "#8B7355",
     paintCodes: null,
     paintNames: { primary: "Scarif Sand", secondary: "Trooper Olive", tertiary: "Dune" }
   },
   "scout-trooper": {
-    name: "Scout Trooper", detachment: "Stormtrooper", prefix: "BK", icon: "two_wheeler",
+    name: "Scout Trooper", detachment: "PathFinders", prefix: "TB", icon: "two_wheeler",
     primary: "#D0D0D0", secondary: "#2C2C2C", tertiary: "#6B8E23",
     paintCodes: null,
     paintNames: { primary: "Shell White", secondary: "Visor Black", tertiary: "Endor" }
   },
   "tie-pilot": {
-    name: "TIE Pilot", detachment: "Starfighter", prefix: "TP", icon: "flight",
+    name: "TIE Pilot", detachment: "Jolly Roger Squadron", prefix: "TI", icon: "flight",
     primary: "#1C1C1C", secondary: "#4169E1", tertiary: "#808080",
     paintCodes: null,
     paintNames: { primary: "Void Black", secondary: "Imperial Navy", tertiary: "Hull Gray" }
   },
   "royal-guard": {
-    name: "Emperor's Royal Guard", detachment: "Imperial Officer", prefix: "RG", icon: "security",
+    name: "Emperor's Royal Guard", detachment: "Sovereign Protectors", prefix: "TR", icon: "security",
     primary: "#8B0000", secondary: "#2C0000", tertiary: "#808080",
     paintCodes: null,
     paintNames: { primary: "Royal Crimson", secondary: "Shadow Maroon", tertiary: "Imperial Gray" }
   },
   "death-trooper": {
-    name: "Death Trooper", detachment: "Stormtrooper", prefix: "DT", icon: "skull",
+    name: "Death Trooper", detachment: "Spec Ops", prefix: "TX", icon: "skull",
     primary: "#0D0D0D", secondary: "#1A472A", tertiary: "#2F4F2F",
     paintCodes: null,
     paintNames: { primary: "Death Black", secondary: "Specter Green", tertiary: "Shadow Green" }
   },
   "shadow-trooper": {
-    name: "Shadow Stormtrooper", detachment: "Stormtrooper", prefix: "SH", icon: "visibility_off",
+    name: "Shadow Stormtrooper", detachment: "Spec Ops", prefix: "TX", icon: "visibility_off",
     primary: "#1A1A1A", secondary: "#333333", tertiary: "#505050",
     paintCodes: null,
     paintNames: { primary: "Shadow Black", secondary: "Stealth Gray", tertiary: "Phantom" }
   },
   "mandalorian": {
-    name: "The Mandalorian", detachment: "Bounty Hunters Guild", prefix: "MN", icon: "shield",
+    name: "The Mandalorian", detachment: "Bounty Hunters Guild", prefix: "BH", icon: "shield",
     primary: "#6B7B8D", secondary: "#4A3728", tertiary: "#8B7D6B",
     paintCodes: null,
     paintNames: { primary: "Beskar", secondary: "Mudhorn Brown", tertiary: "Dune Sand" }
@@ -71,7 +71,7 @@ const COSTUME_PRESETS = {
     paintNames: { primary: "Clone White", secondary: "501st Blue", tertiary: "Torrent" }
   },
   "tusken-raider": {
-    name: "Tusken Raider", detachment: "Bounty Hunters Guild", prefix: "TS", icon: "landscape",
+    name: "Tusken Raider", detachment: "Krayt Clan", prefix: "DZ", icon: "landscape",
     primary: "#8B7355", secondary: "#5C4033", tertiary: "#C4A882",
     paintCodes: null,
     paintNames: { primary: "Dune", secondary: "Bantha Hide", tertiary: "Tatooine Sand" }
