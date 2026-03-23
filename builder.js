@@ -42,9 +42,9 @@ const COSTUME_PRESETS = {
   },
   "royal-guard": {
     name: "Emperor's Royal Guard", detachment: "Imperial Officer", prefix: "RG", icon: "security",
-    primary: "#8B0000", secondary: "#2C0000", tertiary: "#DAA520",
+    primary: "#8B0000", secondary: "#2C0000", tertiary: "#808080",
     paintCodes: null,
-    paintNames: { primary: "Royal Crimson", secondary: "Shadow Maroon", tertiary: "Imperial Gold" }
+    paintNames: { primary: "Royal Crimson", secondary: "Shadow Maroon", tertiary: "Imperial Gray" }
   },
   "death-trooper": {
     name: "Death Trooper", detachment: "Stormtrooper", prefix: "DT", icon: "skull",
