@@ -42,9 +42,9 @@ const COSTUME_PRESETS = {
   },
   "royal-guard": {
     name: "Emperor's Royal Guard", detachment: "Imperial Officer", prefix: "RG", icon: "security",
-    primary: "#8B0000", secondary: "#2C0000", tertiary: "#DAA520",
+    primary: "#8B0000", secondary: "#2C0000", tertiary: "#808080",
     paintCodes: null,
-    paintNames: { primary: "Royal Crimson", secondary: "Shadow Maroon", tertiary: "Imperial Gold" }
+    paintNames: { primary: "Royal Crimson", secondary: "Shadow Maroon", tertiary: "Imperial Gray" }
   },
   "death-trooper": {
     name: "Death Trooper", detachment: "Stormtrooper", prefix: "DT", icon: "skull",
@@ -119,7 +119,8 @@ const builderState = {
   bio: '', troopsCompleted: '', yearsActive: '', sector: '',
   includeTour: true, includeArmory: true,
   images: { hero: null, profile: null, suited: null },
-  buildPhotos: [] // Array of { id, label, image: null }
+  buildPhotos: [], // Array of { id, label, image: null }
+  troops: [] // Array of { id, date, name, location, notes, status: 'complete'|'upcoming' }
 };
 
 // --- Step Navigation ---
@@ -492,6 +493,100 @@ function updateBuildJourneyVisibility() {
     const armoryChecked = document.getElementById('toggle-armory')?.checked ?? true;
     section.classList.toggle('hidden', !armoryChecked);
   }
+}
+
+// --- Troop / Mission Management ---
+let troopCounter = 0;
+
+function addTroop(data) {
+  troopCounter++;
+  const entry = {
+    id: 'troop-' + troopCounter,
+    date: (data && data.date) || '',
+    name: (data && data.name) || '',
+    location: (data && data.location) || '',
+    notes: (data && data.notes) || '',
+    status: (data && data.status) || 'complete'
+  };
+  builderState.troops.push(entry);
+  renderTroopSlot(entry);
+  updateTroopCount();
+}
+
+function renderTroopSlot(entry) {
+  const list = document.getElementById('troops-list');
+  if (!list) return;
+
+  const div = document.createElement('div');
+  div.id = 'troop-slot-' + entry.id;
+  div.className = 'bg-surface-container-low border border-outline-variant/20 rounded-lg p-4 space-y-3';
+  div.innerHTML = `
+    <div class="flex items-center justify-between">
+      <span class="font-label text-[10px] text-outline uppercase tracking-widest">${escHtml(entry.id.replace('troop-', 'Mission #'))}</span>
+      <button onclick="removeTroop('${entry.id}')" class="text-outline hover:text-red-400 transition-colors" title="Remove">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div>
+        <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Event Name</label>
+        <input type="text" value="${escHtml(entry.name)}" data-troop-field="${entry.id}-name" placeholder="e.g. Star Wars Celebration"
+          class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
+      </div>
+      <div>
+        <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Date</label>
+        <input type="text" value="${escHtml(entry.date)}" data-troop-field="${entry.id}-date" placeholder="e.g. March 15, 2025"
+          class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
+      </div>
+      <div>
+        <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Location</label>
+        <input type="text" value="${escHtml(entry.location)}" data-troop-field="${entry.id}-location" placeholder="e.g. Anaheim, CA"
+          class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
+      </div>
+      <div>
+        <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Status</label>
+        <select data-troop-field="${entry.id}-status"
+          class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors">
+          <option value="complete"${entry.status === 'complete' ? ' selected' : ''}>Mission Complete</option>
+          <option value="upcoming"${entry.status === 'upcoming' ? ' selected' : ''}>Upcoming</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Notes (Optional)</label>
+      <input type="text" value="${escHtml(entry.notes)}" data-troop-field="${entry.id}-notes" placeholder="Short description of the event"
+        class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
+    </div>
+  `;
+  list.appendChild(div);
+
+  // Wire up change listeners
+  div.querySelectorAll('[data-troop-field]').forEach(input => {
+    const handler = () => {
+      const field = input.dataset.troopField.replace(entry.id + '-', '');
+      entry[field] = input.value;
+      if (field === 'status') updateTroopCount();
+    };
+    input.addEventListener('change', handler);
+    input.addEventListener('input', handler);
+  });
+}
+
+function removeTroop(id) {
+  builderState.troops = builderState.troops.filter(t => t.id !== id);
+  const slot = document.getElementById('troop-slot-' + id);
+  if (slot) slot.remove();
+  updateTroopCount();
+}
+
+function updateTroopCount() {
+  const completedCount = builderState.troops.filter(t => t.status === 'complete').length;
+  const countEl = document.getElementById('troop-count-display');
+  if (countEl) countEl.textContent = completedCount + ' mission' + (completedCount !== 1 ? 's' : '') + ' logged';
+}
+
+function collectTroops() {
+  // Troop data is already collected via change/input listeners
 }
 
 // --- Image URL resolver for templates ---
@@ -927,9 +1022,68 @@ ${nav.bottomNav}
 function generateTour(forZip) {
   const s = builderState;
   const osv = deriveOnSurfaceVariant(s.primary);
-  const feat1 = getImageSrc('feature1', forZip);
-  const feat2 = getImageSrc('feature2', forZip);
   const nav = navFragment('tour.html', forZip);
+
+  const completedTroops = s.troops.filter(t => t.status === 'complete');
+  const upcomingTroops = s.troops.filter(t => t.status === 'upcoming');
+  const completedCount = completedTroops.length;
+
+  // Build timeline entries for upcoming missions
+  const upcomingHtml = upcomingTroops.map(t => {
+    return `<div class="relative flex flex-col md:flex-row items-start md:items-center">
+<div class="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
+<div class="font-label text-xs text-secondary tracking-widest font-bold mb-1">NEXT DEPLOYMENT</div>
+<h3 class="font-headline text-2xl font-bold uppercase leading-tight">${escHtml(t.name || 'Upcoming Mission')}</h3>
+<p class="font-body text-outline text-sm mt-1">${escHtml(t.location || 'Location TBD')}</p>
+</div>
+<div class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-secondary border-4 border-background transform -translate-x-1/2 z-[1]"></div>
+<div class="md:w-1/2 md:pl-12 pl-12">
+<div class="font-label text-sm text-on-surface tracking-tighter uppercase">${escHtml(t.date || 'Date TBD')}</div>
+${t.notes ? `<p class="font-body text-on-surface-variant text-sm mt-1">${escHtml(t.notes)}</p>` : ''}
+<div class="mt-2 inline-flex items-center gap-2 bg-[${s.secondary}]/10 text-secondary px-3 py-1 rounded-sm border border-secondary/30">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label text-[10px] uppercase font-bold tracking-widest">Awaiting Deployment</span>
+</div>
+</div>
+</div>`;
+  }).join('\n');
+
+  // Build timeline entries for completed missions (newest first)
+  const completedHtml = completedTroops.slice().reverse().map(t => {
+    return `<div class="relative flex flex-col md:flex-row items-start md:items-center opacity-60 hover:opacity-100 transition-all duration-500 p-4 -m-4 rounded-lg">
+<div class="absolute left-4 md:left-1/2 w-3 h-3 rounded-full bg-outline-variant border-2 border-background transform -translate-x-1/2 z-[1]"></div>
+<div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 pl-12 md:pl-0">
+<div class="font-label text-sm text-outline tracking-tighter uppercase">${escHtml(t.date || 'Date not recorded')}</div>
+<div class="mt-2 inline-flex items-center gap-2 bg-outline-variant/30 px-3 py-1 rounded-sm border border-outline-variant/30">
+<span class="material-symbols-outlined text-[12px] text-primary">check_circle</span>
+<span class="font-label text-[10px] uppercase font-bold tracking-widest">Mission Complete</span>
+</div>
+</div>
+<div class="md:w-1/2 md:pl-12 mb-4 md:mb-0 order-1 md:order-2 pl-12">
+<div class="font-label text-xs text-outline tracking-widest font-bold mb-1">DEBRIEF COMPLETE</div>
+<h3 class="font-headline text-2xl font-bold uppercase leading-tight">${escHtml(t.name || 'Mission')}</h3>
+<p class="font-body text-outline text-sm mt-1">${escHtml(t.location || '')}</p>
+${t.notes ? `<p class="font-body text-on-surface-variant text-sm mt-1">${escHtml(t.notes)}</p>` : ''}
+</div>
+</div>`;
+  }).join('\n');
+
+  // Fallback if no troops at all
+  const fallbackHtml = s.troops.length === 0 ? `<div class="relative flex flex-col md:flex-row items-start md:items-center">
+<div class="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
+<div class="font-label text-xs text-secondary tracking-widest font-bold mb-1">NEXT DEPLOYMENT</div>
+<h3 class="font-headline text-2xl font-bold uppercase leading-tight">Your Next Mission</h3>
+<p class="font-body text-outline text-sm mt-1">Location TBD</p>
+</div>
+<div class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-secondary border-4 border-background transform -translate-x-1/2 z-[1]"></div>
+<div class="md:w-1/2 md:pl-12 pl-12">
+<div class="font-label text-sm text-on-surface tracking-tighter uppercase">Date TBD</div>
+<div class="mt-2 inline-flex items-center gap-2 bg-[${s.secondary}]/10 text-secondary px-3 py-1 rounded-sm border border-secondary/30">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label text-[10px] uppercase font-bold tracking-widest">Awaiting Deployment</span>
+</div>
+</div>
+</div>` : '';
 
   return `${headFragment('Tour of Duty | ' + s.siteName, 'Tour of Duty for ' + s.designation + '.', forZip)}
 ${styleFragment(getImageSrc('hero', forZip), forZip)}
@@ -949,7 +1103,7 @@ Tour <span class="text-outline">of</span> Duty
 </div>
 <div class="bg-surface-container-low p-4 rounded-sm border-l-2 border-tertiary">
 <div class="font-label text-[10px] text-outline uppercase tracking-widest mb-1">Status Report</div>
-<div class="font-headline font-bold text-xl text-on-surface">0 MISSIONS LOGGED</div>
+<div class="font-headline font-bold text-xl text-on-surface">${completedCount} MISSION${completedCount !== 1 ? 'S' : ''} LOGGED</div>
 </div>
 </div>
 </section>
@@ -957,39 +1111,9 @@ Tour <span class="text-outline">of</span> Duty
 <section class="relative">
 <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] bg-outline-variant transform md:-translate-x-1/2"></div>
 <div class="space-y-24 relative">
-<!-- Next Deployment -->
-<div class="relative flex flex-col md:flex-row items-start md:items-center">
-<div class="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
-<div class="font-label text-xs text-secondary tracking-widest font-bold mb-1">NEXT DEPLOYMENT</div>
-<h3 class="font-headline text-2xl font-bold uppercase leading-tight">Your Next Mission</h3>
-<p class="font-body text-outline text-sm mt-1">Location TBD</p>
-</div>
-<div class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-secondary border-4 border-background transform -translate-x-1/2 z-[1]"></div>
-<div class="md:w-1/2 md:pl-12 pl-12">
-<div class="font-label text-sm text-on-surface tracking-tighter uppercase">Date TBD</div>
-<div class="mt-2 inline-flex items-center gap-2 bg-[${s.secondary}]/10 text-secondary px-3 py-1 rounded-sm border border-secondary/30">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-<span class="font-label text-[10px] uppercase font-bold tracking-widest">Awaiting Deployment</span>
-</div>
-</div>
-</div>
-<!-- Placeholder Mission 1 -->
-<!-- To add a new mission, copy this block and update the details -->
-<div class="relative flex flex-col md:flex-row items-start md:items-center opacity-60 hover:opacity-100 transition-all duration-500 p-4 -m-4 rounded-lg">
-<div class="absolute left-4 md:left-1/2 w-3 h-3 rounded-full bg-outline-variant border-2 border-background transform -translate-x-1/2 z-[1]"></div>
-<div class="md:w-1/2 md:pr-12 md:text-right order-2 md:order-1 pl-12 md:pl-0">
-<div class="font-label text-sm text-outline tracking-tighter uppercase">Your First Troop Date</div>
-<div class="mt-2 inline-flex items-center gap-2 bg-outline-variant/30 px-3 py-1 rounded-sm border border-outline-variant/30">
-<span class="material-symbols-outlined text-[12px] text-primary">check_circle</span>
-<span class="font-label text-[10px] uppercase font-bold tracking-widest">Mission Complete</span>
-</div>
-</div>
-<div class="md:w-1/2 md:pl-12 mb-4 md:mb-0 order-1 md:order-2 pl-12">
-<div class="font-label text-xs text-outline tracking-widest font-bold mb-1">DEBRIEF COMPLETE</div>
-<h3 class="font-headline text-2xl font-bold uppercase leading-tight">Your First Troop</h3>
-<p class="font-body text-outline text-sm mt-1">Edit this with your event details</p>
-</div>
-</div>
+${fallbackHtml}
+${upcomingHtml}
+${completedHtml}
 </div>
 </section>
 </main>
@@ -1281,6 +1405,9 @@ function generatePreview() {
   const armoryTab = document.getElementById('tab-armory');
   if (tourTab) tourTab.classList.toggle('hidden', !builderState.includeTour);
   if (armoryTab) armoryTab.classList.toggle('hidden', !builderState.includeArmory);
+  // Populate BBCode preview
+  const bbPreview = document.getElementById('bbcode-preview');
+  if (bbPreview) bbPreview.textContent = generateBBCode();
 }
 
 // Script injected into preview HTML to intercept nav clicks
@@ -1346,6 +1473,7 @@ async function downloadSite() {
     if (builderState.includeTour) zip.file('tour.html', generateTour(true));
     if (builderState.includeArmory) zip.file('armory.html', generateArmory(true));
     zip.file('swipe-nav.js', generateSwipeNav(true));
+    zip.file('site-config.json', JSON.stringify(buildSiteConfig(), null, 2));
 
     // Add site images
     const imgFolder = zip.folder('public').folder('images');
@@ -1402,6 +1530,238 @@ async function downloadSite() {
   if (btn) { btn.textContent = 'Download Site'; btn.disabled = false; }
 }
 
+// --- Save / Load Site Config ---
+function buildSiteConfig() {
+  collectStep2();
+  const s = builderState;
+  return {
+    version: 1,
+    costume: s.costume,
+    primary: s.primary, secondary: s.secondary, tertiary: s.tertiary,
+    paintNames: s.paintNames, paintCodes: s.paintCodes,
+    siteName: s.siteName, designation: s.designation,
+    characterFirstName: s.characterFirstName, characterLastName: s.characterLastName,
+    garrison: s.garrison, detachment: s.detachment, squad: s.squad, rank: s.rank,
+    bio: s.bio, troopsCompleted: s.troopsCompleted, yearsActive: s.yearsActive, sector: s.sector,
+    includeTour: s.includeTour, includeArmory: s.includeArmory,
+    troops: s.troops.map(t => ({ date: t.date, name: t.name, location: t.location, notes: t.notes, status: t.status })),
+    buildPhotoLabels: s.buildPhotos.map(bp => bp.label),
+    // Note: images are stored as files in the ZIP, not in the config JSON (too large for base64)
+  };
+}
+
+function loadSiteConfig(configJson) {
+  try {
+    const c = JSON.parse(configJson);
+
+    // Restore costume selection
+    if (c.costume && c.costume !== 'custom' && COSTUME_PRESETS[c.costume]) {
+      selectCostume(c.costume);
+    } else {
+      // Restore custom colors
+      const cp = document.getElementById('custom-primary');
+      const cs = document.getElementById('custom-secondary');
+      const ct = document.getElementById('custom-tertiary');
+      if (cp) cp.value = c.primary || '#4C6043';
+      if (cs) cs.value = c.secondary || '#6D0827';
+      if (ct) ct.value = c.tertiary || '#F59E01';
+      selectCostume('custom');
+    }
+    builderState.primary = c.primary || builderState.primary;
+    builderState.secondary = c.secondary || builderState.secondary;
+    builderState.tertiary = c.tertiary || builderState.tertiary;
+    if (c.paintNames) builderState.paintNames = c.paintNames;
+    if (c.paintCodes !== undefined) builderState.paintCodes = c.paintCodes;
+    updateBuilderTheme();
+
+    // Restore form fields
+    const fieldMap = {
+      'input-sitename': 'siteName', 'input-designation': 'designation',
+      'input-firstname': 'characterFirstName', 'input-lastname': 'characterLastName',
+      'input-garrison': 'garrison', 'input-detachment': 'detachment',
+      'input-squad': 'squad', 'input-rank': 'rank',
+      'input-bio': 'bio', 'input-troops': 'troopsCompleted',
+      'input-years': 'yearsActive', 'input-sector': 'sector'
+    };
+    for (const [elId, key] of Object.entries(fieldMap)) {
+      const el = document.getElementById(elId);
+      if (el && c[key] !== undefined) {
+        el.value = c[key];
+        builderState[key] = c[key];
+      }
+    }
+
+    // Restore toggles
+    const tourToggle = document.getElementById('toggle-tour');
+    const armoryToggle = document.getElementById('toggle-armory');
+    if (tourToggle && c.includeTour !== undefined) { tourToggle.checked = c.includeTour; builderState.includeTour = c.includeTour; }
+    if (armoryToggle && c.includeArmory !== undefined) { armoryToggle.checked = c.includeArmory; builderState.includeArmory = c.includeArmory; }
+    updateBuildJourneyVisibility();
+
+    // Restore troops
+    if (c.troops && Array.isArray(c.troops)) {
+      // Clear existing
+      builderState.troops = [];
+      const list = document.getElementById('troops-list');
+      if (list) list.innerHTML = '';
+      troopCounter = 0;
+      c.troops.forEach(t => addTroop(t));
+    }
+
+    // Restore build photo labels
+    if (c.buildPhotoLabels && Array.isArray(c.buildPhotoLabels)) {
+      // Update existing build photo labels
+      builderState.buildPhotos.forEach((bp, i) => {
+        if (c.buildPhotoLabels[i]) {
+          bp.label = c.buildPhotoLabels[i];
+          const labelInput = document.querySelector(`[data-build-label="${bp.id}"]`);
+          if (labelInput) labelInput.value = c.buildPhotoLabels[i];
+        }
+      });
+      // Add extra build photos if config has more
+      for (let i = builderState.buildPhotos.length; i < c.buildPhotoLabels.length; i++) {
+        addBuildPhoto(c.buildPhotoLabels[i]);
+      }
+    }
+
+    alert('Site config loaded! Your data has been restored. Re-upload your images if needed, then preview and download.');
+  } catch (e) {
+    console.error('Failed to load config:', e);
+    alert('Error loading config file. Make sure it is a valid site-config.json.');
+  }
+}
+
+function triggerLoadConfig() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => loadSiteConfig(reader.result);
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// --- BBCode Forum Post Generator ---
+function generateBBCode() {
+  collectStep2();
+  const s = builderState;
+  const costumeName = getCostumeName();
+  const completedTroops = s.troops.filter(t => t.status === 'complete');
+  const upcomingTroops = s.troops.filter(t => t.status === 'upcoming');
+
+  let bb = '';
+  bb += '[b][size=150]' + s.designation + ' — ' + costumeName + '[/size][/b]\n';
+  bb += '[b]' + s.characterFirstName + ' ' + s.characterLastName + '[/b]\n\n';
+
+  bb += '[b]Garrison:[/b] ' + s.garrison + '\n';
+  bb += '[b]Detachment:[/b] ' + s.detachment + '\n';
+  if (s.squad) bb += '[b]Squad:[/b] ' + s.squad + '\n';
+  bb += '[b]Rank:[/b] ' + s.rank + '\n';
+  bb += '[b]Home Sector:[/b] ' + s.sector + '\n';
+  bb += '[b]Troops Completed:[/b] ' + s.troopsCompleted + '\n';
+  bb += '[b]Years Active:[/b] ' + s.yearsActive + '\n\n';
+
+  if (s.bio) {
+    bb += '[b]About:[/b]\n' + s.bio + '\n\n';
+  }
+
+  // Armor palette
+  bb += '[b]Armor Palette:[/b]\n';
+  bb += '• ' + s.paintNames.primary + ' (Primary): ' + s.primary;
+  if (s.paintCodes && s.paintCodes.primary) bb += ' — ' + s.paintCodes.primary;
+  bb += '\n';
+  bb += '• ' + s.paintNames.secondary + ' (Secondary): ' + s.secondary;
+  if (s.paintCodes && s.paintCodes.secondary) bb += ' — ' + s.paintCodes.secondary;
+  bb += '\n';
+  bb += '• ' + s.paintNames.tertiary + ' (Tertiary): ' + s.tertiary;
+  if (s.paintCodes && s.paintCodes.tertiary) bb += ' — ' + s.paintCodes.tertiary;
+  bb += '\n\n';
+
+  // Troop log
+  if (completedTroops.length > 0 || upcomingTroops.length > 0) {
+    bb += '[b][size=120]Tour of Duty[/size][/b]\n\n';
+  }
+
+  if (upcomingTroops.length > 0) {
+    bb += '[b]Upcoming Deployments:[/b]\n';
+    upcomingTroops.forEach(t => {
+      bb += '• ' + (t.name || 'Upcoming Mission');
+      if (t.date) bb += ' — ' + t.date;
+      if (t.location) bb += ' (' + t.location + ')';
+      if (t.notes) bb += ' — ' + t.notes;
+      bb += '\n';
+    });
+    bb += '\n';
+  }
+
+  if (completedTroops.length > 0) {
+    bb += '[b]Completed Missions:[/b]\n';
+    completedTroops.slice().reverse().forEach(t => {
+      bb += '[color=green]✓[/color] ' + (t.name || 'Mission');
+      if (t.date) bb += ' — ' + t.date;
+      if (t.location) bb += ' (' + t.location + ')';
+      if (t.notes) bb += ' — ' + t.notes;
+      bb += '\n';
+    });
+    bb += '\n';
+  }
+
+  // Images — include Imgur URLs if provided
+  const imgUrls = [];
+  for (const [slot, imgData] of Object.entries(s.images)) {
+    if (imgData && imgData.type === 'url') {
+      imgUrls.push({ label: slot, url: imgData.url });
+    }
+  }
+  s.buildPhotos.forEach(bp => {
+    if (bp.image && bp.image.type === 'url') {
+      imgUrls.push({ label: bp.label, url: bp.image.url });
+    }
+  });
+  if (imgUrls.length > 0) {
+    bb += '[b]Images:[/b]\n';
+    imgUrls.forEach(img => {
+      bb += '[img]' + img.url + '[/img]\n';
+    });
+    bb += '\n';
+  }
+
+  bb += '[size=85][i]Generated with Trooper Template Builder[/i][/size]';
+  return bb;
+}
+
+function copyBBCode() {
+  const bbcode = generateBBCode();
+  navigator.clipboard.writeText(bbcode).then(() => {
+    const btn = document.getElementById('copy-bbcode-btn');
+    if (btn) {
+      const origText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined">check</span> Copied!';
+      setTimeout(() => { btn.innerHTML = origText; }, 2000);
+    }
+  }).catch(() => {
+    // Fallback: show in a textarea for manual copy
+    const ta = document.createElement('textarea');
+    ta.value = bbcode;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('copy-bbcode-btn');
+    if (btn) {
+      const origText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined">check</span> Copied!';
+      setTimeout(() => { btn.innerHTML = origText; }, 2000);
+    }
+  });
+}
+
 // --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
   renderCostumeGrid();
@@ -1412,5 +1772,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const armoryToggle = document.getElementById('toggle-armory');
   if (armoryToggle) {
     armoryToggle.addEventListener('change', updateBuildJourneyVisibility);
+  }
+  // Check if a config was passed from the splash page
+  const pendingConfig = sessionStorage.getItem('pending-site-config');
+  if (pendingConfig) {
+    sessionStorage.removeItem('pending-site-config');
+    loadSiteConfig(pendingConfig);
   }
 });
