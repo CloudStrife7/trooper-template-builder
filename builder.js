@@ -1773,4 +1773,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (armoryToggle) {
     armoryToggle.addEventListener('change', updateBuildJourneyVisibility);
   }
+  // Check if a config was passed from the splash page
+  const pendingConfig = sessionStorage.getItem('pending-site-config');
+  if (pendingConfig) {
+    sessionStorage.removeItem('pending-site-config');
+    loadSiteConfig(pendingConfig);
+  }
 });

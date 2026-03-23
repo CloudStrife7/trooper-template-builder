@@ -5,8 +5,8 @@
 <title>Trooper Template Builder</title>
 <meta name="description" content="Build your own 501st Legion trooper website in minutes. Pick your costume, customize your colors, and download a ready-to-deploy site."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
   darkMode: "class",
@@ -16,7 +16,7 @@ tailwind.config = {
         "primary": "#4C6043",
         "secondary": "#6D0827",
         "tertiary": "#F59E01",
-        "background": "#131411",
+        "background": "#0a0b09",
         "surface": "#131411",
         "surface-container-low": "#1b1c19",
         "surface-container-high": "#1b1c19",
@@ -32,418 +32,284 @@ tailwind.config = {
         "body": ["Inter"],
         "label": ["Space Grotesk"]
       },
-      borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
     },
   },
 }
 </script>
 <style>
+@font-face {
+  font-family: 'Aurebesh';
+  src: url('data:font/woff2;base64,') format('woff2');
+}
 .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
-body { background-color: #131411; color: #e4e2de; font-family: 'Inter', sans-serif; }
-input[type="color"] { -webkit-appearance: none; border: none; }
-input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-input[type="color"]::-webkit-color-swatch { border: 1px solid #444840; border-radius: 4px; }
+body { background-color: #0a0b09; color: #e4e2de; font-family: 'Inter', sans-serif; }
+
+/* Aurebesh-style decorative text using Space Grotesk with effects */
+.aurebesh {
+  font-family: 'Space Grotesk', monospace;
+  letter-spacing: 0.4em;
+  opacity: 0.12;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Scanline overlay */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Glow effects */
+.glow-tertiary {
+  text-shadow: 0 0 40px rgba(245, 158, 1, 0.3), 0 0 80px rgba(245, 158, 1, 0.1);
+}
+.glow-primary {
+  text-shadow: 0 0 40px rgba(76, 96, 67, 0.4), 0 0 80px rgba(76, 96, 67, 0.15);
+}
+.glow-box {
+  box-shadow: 0 0 60px rgba(245, 158, 1, 0.08), 0 0 120px rgba(76, 96, 67, 0.05);
+}
+
+/* Animated border */
+@keyframes borderPulse {
+  0%, 100% { border-color: rgba(245, 158, 1, 0.2); }
+  50% { border-color: rgba(245, 158, 1, 0.5); }
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Grid background */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(76, 96, 67, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(76, 96, 67, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Fade in */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in-1 { animation: fadeInUp 0.8s ease-out 0.1s both; }
+.fade-in-2 { animation: fadeInUp 0.8s ease-out 0.3s both; }
+.fade-in-3 { animation: fadeInUp 0.8s ease-out 0.5s both; }
+.fade-in-4 { animation: fadeInUp 0.8s ease-out 0.7s both; }
+.fade-in-5 { animation: fadeInUp 0.8s ease-out 0.9s both; }
 </style>
 </head>
-<body class="min-h-screen flex flex-col bg-background text-on-surface font-body">
-<!-- Header -->
-<nav class="bg-[#131411] sticky top-0 z-50 border-b border-outline-variant/30">
-<div class="flex justify-between items-center w-full px-6 h-16 max-w-none">
-<a href="index.html" class="text-xl font-black text-on-surface-variant tracking-widest font-headline uppercase hover:text-on-surface transition-colors">
-Trooper Builder
-</a>
-<div class="flex items-center gap-4">
-<button onclick="triggerLoadConfig()" class="flex items-center gap-1.5 px-3 py-1.5 border border-outline-variant/40 rounded-lg hover:border-tertiary transition-colors group" title="Load a previous site-config.json to continue editing">
-<span class="material-symbols-outlined text-sm text-outline group-hover:text-tertiary transition-colors">upload_file</span>
-<span class="font-label text-[10px] text-outline uppercase tracking-wider group-hover:text-tertiary transition-colors hidden sm:inline">Load Config</span>
-</button>
-<div id="color-preview" class="flex gap-1.5"></div>
-<span class="font-label text-[10px] text-outline uppercase tracking-widest hidden md:block">Template Builder</span>
-</div>
-</div>
-</nav>
+<body class="min-h-screen flex flex-col overflow-x-hidden">
 
-<main class="flex-grow w-full max-w-4xl mx-auto px-6 py-10">
-<!-- Title -->
-<div class="mb-10">
-<span class="font-label text-xs tracking-[0.3em] text-primary uppercase mb-3 block">Build Your Own</span>
-<h1 class="font-headline text-4xl md:text-6xl font-extrabold tracking-tighter leading-none uppercase mb-4">
-Trooper <span class="text-outline">Template</span> Builder
-</h1>
-<p class="font-body text-on-surface-variant max-w-xl">Pick your costume, enter your info, upload your images, and download a ready-to-deploy trooper website.</p>
+<!-- Decorative Aurebesh strips -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+  <!-- Top left aurebesh -->
+  <div class="aurebesh absolute top-16 -left-4 text-primary text-[10px] rotate-90 whitespace-nowrap">
+    CRESH OSK MERN BESH AUREK TRILL HERF SENTH KRILL NERN ZEREK
+  </div>
+  <!-- Right side aurebesh -->
+  <div class="aurebesh absolute top-1/3 -right-4 text-tertiary text-[10px] -rotate-90 whitespace-nowrap">
+    FORN GREK ENTH ONITH KRENTH RESH SENTH TRILL VEV WESK XESH YIRT
+  </div>
+  <!-- Bottom aurebesh -->
+  <div class="aurebesh absolute bottom-8 left-1/4 text-secondary text-[10px] whitespace-nowrap">
+    BESH CRESH DORN ESK FORN GREK HERF ISK JENTH KRILL LETH MERN NERN
+  </div>
+  <!-- Grid overlay -->
+  <div class="absolute inset-0 grid-bg"></div>
 </div>
 
-<!-- Step Indicator -->
-<div class="flex items-center gap-0 mb-12">
-<div data-step-indicator="1" class="w-10 h-10 rounded-full flex items-center justify-center font-headline font-bold text-sm bg-tertiary text-black transition-colors">1</div>
-<div data-step-line="1" class="flex-1 h-[2px] bg-surface-container-high transition-colors"></div>
-<div data-step-indicator="2" class="w-10 h-10 rounded-full flex items-center justify-center font-headline font-bold text-sm bg-surface-container-high text-outline transition-colors">2</div>
-<div data-step-line="2" class="flex-1 h-[2px] bg-surface-container-high transition-colors"></div>
-<div data-step-indicator="3" class="w-10 h-10 rounded-full flex items-center justify-center font-headline font-bold text-sm bg-surface-container-high text-outline transition-colors">3</div>
-<div data-step-line="3" class="flex-1 h-[2px] bg-surface-container-high transition-colors"></div>
-<div data-step-indicator="4" class="w-10 h-10 rounded-full flex items-center justify-center font-headline font-bold text-sm bg-surface-container-high text-outline transition-colors">4</div>
+<!-- Main Content -->
+<div class="relative z-10 flex-grow flex flex-col">
+
+  <!-- Nav -->
+  <nav class="w-full px-6 h-16 flex items-center justify-between border-b border-outline-variant/20">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield</span>
+      <span class="font-headline text-sm font-bold tracking-widest uppercase text-on-surface-variant">TTB</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+      <span class="font-label text-[10px] text-outline uppercase tracking-widest">Systems Online</span>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <main class="flex-grow flex flex-col items-center justify-center px-6 py-16 md:py-24">
+
+    <!-- Transmission badge -->
+    <div class="fade-in-1 mb-8">
+      <div class="inline-flex items-center gap-3 px-4 py-2 border border-tertiary/30 rounded-sm bg-tertiary/5" style="animation: borderPulse 3s ease-in-out infinite;">
+        <span class="material-symbols-outlined text-tertiary text-sm" style="font-variation-settings: 'FILL' 1;">cell_tower</span>
+        <span class="font-label text-[10px] text-tertiary uppercase tracking-[0.3em] font-bold">Imperial Holonet Transmission</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+      </div>
+    </div>
+
+    <!-- Main title -->
+    <div class="fade-in-2 text-center max-w-4xl mb-6">
+      <h1 class="font-headline text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter leading-[0.85] uppercase mb-6">
+        <span class="text-on-surface">Trooper</span><br/>
+        <span class="text-primary glow-primary">Template</span><br/>
+        <span class="text-outline">Builder</span>
+      </h1>
+    </div>
+
+    <!-- Tagline -->
+    <div class="fade-in-3 text-center max-w-2xl mb-12">
+      <p class="font-body text-lg md:text-xl text-on-surface-variant leading-relaxed mb-4">
+        Display your troops, your build, and your costume photos on your own personal website.
+      </p>
+      <p class="font-headline text-2xl md:text-3xl font-bold text-tertiary glow-tertiary uppercase tracking-tight">
+        Live in 20 minutes or less.
+      </p>
+    </div>
+
+    <!-- Feature pills -->
+    <div class="fade-in-3 flex flex-wrap justify-center gap-3 mb-14 max-w-xl">
+      <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-primary text-sm">palette</span>
+        <span class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">12 Costumes</span>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-secondary text-sm">military_tech</span>
+        <span class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">Tour of Duty</span>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-tertiary text-sm">shield</span>
+        <span class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">Armory Page</span>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-primary text-sm">forum</span>
+        <span class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">Forum Post Generator</span>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-secondary text-sm">code</span>
+        <span class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">Zero Coding</span>
+      </div>
+      <div class="flex items-center gap-2 px-4 py-2 bg-surface-container-low rounded-sm border border-outline-variant/20">
+        <span class="material-symbols-outlined text-tertiary text-sm">bolt</span>
+        <span class="font-label text-[10px] uppercase tracking-wider text-on-surface-variant">Free Hosting</span>
+      </div>
+    </div>
+
+    <!-- CTA Buttons -->
+    <div class="fade-in-4 flex flex-col sm:flex-row gap-4 mb-16">
+      <a href="builder.html" class="group bg-tertiary text-black px-10 py-5 rounded-lg font-headline font-bold uppercase tracking-wider hover:opacity-90 transition-all flex items-center justify-center gap-3 text-lg glow-box" style="animation: float 4s ease-in-out infinite;">
+        <span class="material-symbols-outlined">rocket_launch</span>
+        Start Building
+        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </a>
+      <button onclick="loadExistingConfig()" class="group border-2 border-primary/50 hover:border-primary text-on-surface px-10 py-5 rounded-lg font-headline font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-3 text-lg hover:bg-primary/10">
+        <span class="material-symbols-outlined">upload_file</span>
+        Load Existing Site
+      </button>
+    </div>
+
+    <!-- How it works -->
+    <div class="fade-in-5 w-full max-w-3xl">
+      <div class="flex items-center gap-4 mb-8">
+        <div class="h-[1px] flex-grow bg-outline-variant/30"></div>
+        <span class="font-label text-[10px] text-outline uppercase tracking-[0.3em]">Mission Briefing</span>
+        <div class="h-[1px] flex-grow bg-outline-variant/30"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="scanlines relative bg-surface-container-low/80 p-6 rounded-sm border border-outline-variant/20 border-l-2 border-l-primary">
+          <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-headline font-bold text-sm text-primary">1</span>
+              <span class="font-label text-[10px] text-outline uppercase tracking-widest">Phase One</span>
+            </div>
+            <h3 class="font-headline font-bold uppercase text-lg mb-2">Choose &amp; Customize</h3>
+            <p class="font-body text-sm text-on-surface-variant">Pick your costume. Set your colors. Enter your trooper details and upload your photos.</p>
+          </div>
+        </div>
+        <div class="scanlines relative bg-surface-container-low/80 p-6 rounded-sm border border-outline-variant/20 border-l-2 border-l-tertiary">
+          <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="w-8 h-8 rounded-full bg-tertiary/20 flex items-center justify-center font-headline font-bold text-sm text-tertiary">2</span>
+              <span class="font-label text-[10px] text-outline uppercase tracking-widest">Phase Two</span>
+            </div>
+            <h3 class="font-headline font-bold uppercase text-lg mb-2">Download</h3>
+            <p class="font-body text-sm text-on-surface-variant">Preview your site. Download the ZIP. Copy your forum post. Everything in one click.</p>
+          </div>
+        </div>
+        <div class="scanlines relative bg-surface-container-low/80 p-6 rounded-sm border border-outline-variant/20 border-l-2 border-l-secondary">
+          <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center font-headline font-bold text-sm text-secondary">3</span>
+              <span class="font-label text-[10px] text-outline uppercase tracking-widest">Phase Three</span>
+            </div>
+            <h3 class="font-headline font-bold uppercase text-lg mb-2">Deploy</h3>
+            <p class="font-body text-sm text-on-surface-variant">Upload to GitHub Pages. Your site is live. Update anytime by loading your config.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full py-8 border-t border-outline-variant/20">
+    <div class="flex flex-col items-center gap-3 px-8">
+      <div class="font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/40">
+        Trooper Template Builder
+      </div>
+      <div class="flex gap-6 items-center">
+        <a href="builder.html" class="font-label text-[10px] tracking-[0.2em] uppercase text-tertiary hover:text-on-surface transition-colors">
+          Launch Builder
+        </a>
+        <a class="text-on-surface-variant/30 hover:text-on-surface-variant/60 transition-all font-label text-[9px] tracking-[0.2em] uppercase flex items-center gap-1.5" href="https://github.com/CloudStrife7/trooper-template-builder" target="_blank" rel="noopener">
+          <svg class="w-3 h-3 fill-current" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+      <!-- Decorative aurebesh footer -->
+      <div class="aurebesh text-primary text-[8px] mt-2 tracking-[0.6em]">
+        DORN ESKA FORN GREK HERF ISKA JENTH
+      </div>
+    </div>
+  </footer>
+
 </div>
 
-<!-- ===================== STEP 1: COSTUME ===================== -->
-<div id="step-1">
-<div class="mb-8">
-<h2 class="font-headline text-2xl font-bold uppercase tracking-tight mb-2">Choose Your Costume</h2>
-<p class="font-body text-sm text-on-surface-variant">Select your character and the theme colors will auto-apply to your site.</p>
-</div>
-<div id="costume-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10"></div>
-<div class="flex justify-end">
-<button onclick="nextStep()" class="bg-tertiary text-black px-8 py-3 rounded-lg font-headline font-bold uppercase tracking-wider hover:opacity-90 transition-all flex items-center gap-2">
-Next <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</div>
-</div>
-
-<!-- ===================== STEP 2: IDENTITY ===================== -->
-<div id="step-2" class="hidden">
-<div class="mb-8">
-<h2 class="font-headline text-2xl font-bold uppercase tracking-tight mb-2">Your Identity</h2>
-<p class="font-body text-sm text-on-surface-variant">Fill in your trooper details. These will populate across your site.</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-<!-- Site Name -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Site Name</label>
-<input id="input-sitename" type="text" placeholder="My Trooper Site" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Designation -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Designation (TK/BH Number)</label>
-<input id="input-designation" type="text" placeholder="TK-0000" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Character First Name -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Character First Name (Hero Title Line 1)</label>
-<input id="input-firstname" type="text" placeholder="STORM" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body uppercase focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Character Last Name -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Character Last Name (Hero Title Line 2)</label>
-<input id="input-lastname" type="text" placeholder="TROOPER" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body uppercase focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Garrison -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Garrison</label>
-<input id="input-garrison" type="text" placeholder="Your Garrison" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Detachment -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Detachment</label>
-<input id="input-detachment" type="text" placeholder="Your Detachment" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Squad -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Squad (Optional)</label>
-<input id="input-squad" type="text" placeholder="Your Squad" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Rank -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Rank</label>
-<input id="input-rank" type="text" placeholder="Trooper" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Troops Completed -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Troops Completed</label>
-<input id="input-troops" type="text" placeholder="0" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Years Active -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Years Active</label>
-<input id="input-years" type="text" placeholder="1" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-<!-- Sector -->
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Home Sector / State Abbreviation</label>
-<input id="input-sector" type="text" placeholder="WI" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body uppercase focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors" maxlength="4"/>
-</div>
-</div>
-<!-- Bio -->
-<div class="mb-8">
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Bio / About You</label>
-<textarea id="input-bio" rows="4" placeholder="A proud member of the 501st Legion..." class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-3 text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors resize-y"></textarea>
-</div>
-<!-- Troops / Missions -->
-<div class="mb-8">
-<div class="flex items-center gap-4 mb-4">
-<span class="font-label text-[10px] text-outline uppercase tracking-[0.3em]">Tour of Duty — Missions</span>
-<div class="h-[1px] flex-grow bg-outline-variant/40"></div>
-<span id="troop-count-display" class="font-label text-[10px] text-outline uppercase tracking-widest">0 missions logged</span>
-</div>
-<p class="font-body text-xs text-on-surface-variant mb-4">Add your troops and events here. These will populate your Tour of Duty page and forum post.</p>
-<div id="troops-list" class="space-y-3 mb-4"></div>
-<button onclick="addTroop()" class="w-full border-2 border-dashed border-outline-variant/30 rounded-lg py-3 flex items-center justify-center gap-2 hover:border-tertiary transition-colors group">
-<span class="material-symbols-outlined text-outline group-hover:text-tertiary transition-colors">add_circle</span>
-<span class="font-label text-xs text-outline uppercase tracking-wider group-hover:text-tertiary transition-colors">Add a Troop / Mission</span>
-</button>
-</div>
-<!-- Page Toggles -->
-<div class="flex flex-wrap gap-8 mb-10 p-6 bg-surface-container-low rounded-lg border border-outline-variant/20">
-<label class="flex items-center gap-3 cursor-pointer group">
-<input id="toggle-tour" type="checkbox" checked class="w-5 h-5 rounded bg-surface-container-high border-outline-variant text-tertiary focus:ring-tertiary cursor-pointer"/>
-<div>
-<div class="font-headline font-bold text-sm uppercase">Tour of Duty Page</div>
-<div class="font-label text-[10px] text-outline tracking-wider">Mission timeline for your troops</div>
-</div>
-</label>
-<label class="flex items-center gap-3 cursor-pointer group">
-<input id="toggle-armory" type="checkbox" checked class="w-5 h-5 rounded bg-surface-container-high border-outline-variant text-tertiary focus:ring-tertiary cursor-pointer"/>
-<div>
-<div class="font-headline font-bold text-sm uppercase">Armory Page</div>
-<div class="font-label text-[10px] text-outline tracking-wider">Build details &amp; armor palette</div>
-</div>
-</label>
-</div>
-<div class="flex justify-between">
-<button onclick="prevStep()" class="border border-outline-variant/50 text-on-surface px-6 py-3 rounded-lg font-headline font-bold uppercase tracking-wider hover:border-on-surface transition-all flex items-center gap-2">
-<span class="material-symbols-outlined text-sm">arrow_back</span> Back
-</button>
-<button onclick="nextStep()" class="bg-tertiary text-black px-8 py-3 rounded-lg font-headline font-bold uppercase tracking-wider hover:opacity-90 transition-all flex items-center gap-2">
-Next <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</div>
-</div>
-
-<!-- ===================== STEP 3: IMAGES ===================== -->
-<div id="step-3" class="hidden">
-<div class="mb-8">
-<h2 class="font-headline text-2xl font-bold uppercase tracking-tight mb-2">Your Images</h2>
-<p class="font-body text-sm text-on-surface-variant">Drag and drop images or paste Imgur URLs. All images are optional — placeholders will be used for any you skip.</p>
-</div>
-
-<!-- Site Images -->
-<div class="mb-10">
-<div class="flex items-center gap-4 mb-6">
-<span class="font-label text-[10px] text-outline uppercase tracking-[0.3em]">Site Images</span>
-<div class="h-[1px] flex-grow bg-outline-variant/40"></div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div class="md:col-span-2">
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Hero Background Image</label>
-<div id="drop-hero" class="relative border-2 border-dashed border-outline-variant/40 rounded-lg h-48 flex flex-col items-center justify-center cursor-pointer hover:border-tertiary transition-colors">
-<span class="material-symbols-outlined text-4xl text-outline mb-2">add_photo_alternate</span>
-<span class="font-label text-xs text-outline uppercase tracking-wider">Drop image or click to upload</span>
-</div>
-<div class="mt-2 flex items-center gap-2">
-<span class="font-label text-[10px] text-outline uppercase tracking-wider">Or paste URL:</span>
-<input id="url-hero" type="text" placeholder="https://i.imgur.com/..." class="flex-1 bg-surface-container-low border border-outline-variant/30 rounded px-3 py-1.5 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
-</div>
-</div>
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Profile Photo (About Page)</label>
-<div id="drop-profile" class="relative border-2 border-dashed border-outline-variant/40 rounded-lg h-40 flex flex-col items-center justify-center cursor-pointer hover:border-tertiary transition-colors">
-<span class="material-symbols-outlined text-3xl text-outline mb-1">person</span>
-<span class="font-label text-[10px] text-outline uppercase tracking-wider">Drop or click</span>
-</div>
-<div class="mt-2">
-<input id="url-profile" type="text" placeholder="Imgur URL..." class="w-full bg-surface-container-low border border-outline-variant/30 rounded px-3 py-1.5 text-sm text-on-surface font-body focus:border-tertiary outline-none"/>
-</div>
-</div>
-<div>
-<label class="font-label text-[10px] text-outline uppercase tracking-widest mb-2 block">Suited Up / Glamour Shot</label>
-<div id="drop-suited" class="relative border-2 border-dashed border-outline-variant/40 rounded-lg h-40 flex flex-col items-center justify-center cursor-pointer hover:border-tertiary transition-colors">
-<span class="material-symbols-outlined text-3xl text-outline mb-1">military_tech</span>
-<span class="font-label text-[10px] text-outline uppercase tracking-wider">Drop or click</span>
-</div>
-<div class="mt-2">
-<input id="url-suited" type="text" placeholder="Imgur URL..." class="w-full bg-surface-container-low border border-outline-variant/30 rounded px-3 py-1.5 text-sm text-on-surface font-body focus:border-tertiary outline-none"/>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Build Journey Images (only if Armory enabled) -->
-<div id="build-journey-section" class="mb-10">
-<div class="flex items-center gap-4 mb-4">
-<span class="font-label text-[10px] text-outline uppercase tracking-[0.3em]">Build Journey</span>
-<div class="h-[1px] flex-grow bg-outline-variant/40"></div>
-<span class="font-label text-[10px] text-outline uppercase tracking-widest">Armory Page</span>
-</div>
-<p class="font-body text-xs text-on-surface-variant mb-6">Add photos from your build process. These will populate your Armory page's journey section.</p>
-<div id="build-photos-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-<!-- Default 3 slots rendered by JS -->
-</div>
-<button onclick="addBuildPhoto()" class="w-full border-2 border-dashed border-outline-variant/30 rounded-lg py-4 flex items-center justify-center gap-2 hover:border-tertiary transition-colors group">
-<span class="material-symbols-outlined text-outline group-hover:text-tertiary transition-colors">add_circle</span>
-<span class="font-label text-xs text-outline uppercase tracking-wider group-hover:text-tertiary transition-colors">Add Another Build Photo</span>
-</button>
-</div>
-<div class="flex justify-between">
-<button onclick="prevStep()" class="border border-outline-variant/50 text-on-surface px-6 py-3 rounded-lg font-headline font-bold uppercase tracking-wider hover:border-on-surface transition-all flex items-center gap-2">
-<span class="material-symbols-outlined text-sm">arrow_back</span> Back
-</button>
-<button onclick="nextStep()" class="bg-tertiary text-black px-8 py-3 rounded-lg font-headline font-bold uppercase tracking-wider hover:opacity-90 transition-all flex items-center gap-2">
-Preview <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</div>
-</div>
-
-<!-- ===================== STEP 4: PREVIEW & DOWNLOAD ===================== -->
-<div id="step-4" class="hidden">
-<div class="mb-8">
-<h2 class="font-headline text-2xl font-bold uppercase tracking-tight mb-2">Preview &amp; Download</h2>
-<p class="font-body text-sm text-on-surface-variant">Preview your generated site below, then download the ZIP to deploy.</p>
-</div>
-<!-- Preview Tabs -->
-<div class="flex gap-2 mb-4 flex-wrap">
-<button data-preview-tab="index" onclick="previewPage('index')" class="px-4 py-2 rounded font-label text-xs uppercase tracking-wider bg-tertiary text-black transition-colors">Home</button>
-<button data-preview-tab="about" onclick="previewPage('about')" class="px-4 py-2 rounded font-label text-xs uppercase tracking-wider bg-surface-container-high text-outline transition-colors">About</button>
-<button data-preview-tab="tour" onclick="previewPage('tour')" class="px-4 py-2 rounded font-label text-xs uppercase tracking-wider bg-surface-container-high text-outline transition-colors" id="tab-tour">Tour</button>
-<button data-preview-tab="armory" onclick="previewPage('armory')" class="px-4 py-2 rounded font-label text-xs uppercase tracking-wider bg-surface-container-high text-outline transition-colors" id="tab-armory">Armory</button>
-</div>
-<!-- Preview Frame -->
-<div class="relative mb-8">
-<div id="preview-loader" class="absolute inset-0 bg-background/80 flex items-center justify-center z-10 rounded-lg hidden">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined animate-spin text-tertiary">progress_activity</span>
-<span class="font-label text-sm text-outline uppercase tracking-wider">Loading preview...</span>
-</div>
-</div>
-<iframe id="preview-frame" class="w-full h-[600px] border border-outline-variant/30 rounded-lg bg-background" sandbox="allow-scripts allow-same-origin"></iframe>
-</div>
-<!-- Download -->
-<div class="bg-surface-container-low rounded-lg p-8 border border-outline-variant/20 mb-8">
-<div class="flex flex-col md:flex-row items-center justify-between gap-6">
-<div>
-<h3 class="font-headline text-xl font-bold uppercase mb-2">Ready to Deploy</h3>
-<p class="font-body text-sm text-on-surface-variant">Download your site as a ZIP file. Upload to GitHub Pages, Netlify, or any static host.</p>
-</div>
-<button id="download-btn" onclick="downloadSite()" class="bg-tertiary text-black px-10 py-4 rounded-lg font-headline font-bold uppercase tracking-wider hover:opacity-90 transition-all flex items-center gap-3 whitespace-nowrap">
-<span class="material-symbols-outlined">download</span>
-Download Site
-</button>
-</div>
-</div>
-<!-- Forum Post (BBCode) -->
-<div class="bg-surface-container-low rounded-lg p-8 border border-outline-variant/20 mb-8">
-<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-4">
-<div>
-<h3 class="font-headline text-xl font-bold uppercase mb-2">Forum Post</h3>
-<p class="font-body text-sm text-on-surface-variant">Auto-generated BBCode for your forum thread. Copy and paste into your Bounty Hunters Guild or detachment forum.</p>
-</div>
-<button id="copy-bbcode-btn" onclick="copyBBCode()" class="bg-secondary text-white px-8 py-4 rounded-lg font-headline font-bold uppercase tracking-wider hover:opacity-90 transition-all flex items-center gap-3 whitespace-nowrap">
-<span class="material-symbols-outlined">content_copy</span>
-Copy Forum Post
-</button>
-</div>
-<div class="bg-background rounded border border-outline-variant/30 p-4 max-h-60 overflow-y-auto">
-<pre id="bbcode-preview" class="font-body text-xs text-on-surface-variant whitespace-pre-wrap break-words"></pre>
-</div>
-</div>
-<!-- Deploy Instructions -->
-<div class="bg-surface-container-low rounded-lg p-6 border border-outline-variant/20 space-y-6">
-<h4 class="font-headline font-bold uppercase text-sm">How to Put Your Site Online (Free)</h4>
-<p class="font-body text-sm text-on-surface-variant">Don't worry if you've never done this before &mdash; it only takes a few minutes and it's completely free. Follow these steps:</p>
-
-<!-- Step 1 -->
-<div class="border-l-2 border-tertiary pl-5">
-<div class="font-headline font-bold text-sm uppercase mb-2 flex items-center gap-2">
-<span class="w-7 h-7 rounded-full bg-tertiary text-black flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-Create a GitHub Account (skip if you have one)
-</div>
-<p class="font-body text-sm text-on-surface-variant mb-2">Go to <code class="text-on-surface bg-outline-variant/20 px-1.5 py-0.5 rounded text-xs">github.com</code> and click <strong class="text-on-surface">Sign Up</strong>. It's free. Use any email &mdash; this is just where your website files will live.</p>
-</div>
-
-<!-- Step 2 -->
-<div class="border-l-2 border-tertiary pl-5">
-<div class="font-headline font-bold text-sm uppercase mb-2 flex items-center gap-2">
-<span class="w-7 h-7 rounded-full bg-tertiary text-black flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-Unzip Your Download
-</div>
-<p class="font-body text-sm text-on-surface-variant">Find the ZIP file you just downloaded and extract/unzip it. You should see files like <code class="text-on-surface bg-outline-variant/20 px-1.5 py-0.5 rounded text-xs">index.html</code>, <code class="text-on-surface bg-outline-variant/20 px-1.5 py-0.5 rounded text-xs">about.html</code>, etc.</p>
-</div>
-
-<!-- Step 3 -->
-<div class="border-l-2 border-tertiary pl-5">
-<div class="font-headline font-bold text-sm uppercase mb-2 flex items-center gap-2">
-<span class="w-7 h-7 rounded-full bg-tertiary text-black flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-Create a New Repository
-</div>
-<ol class="font-body text-sm text-on-surface-variant space-y-2 list-none">
-<li class="flex gap-2">&bull; On GitHub, click the <strong class="text-on-surface">+</strong> button in the top right &rarr; <strong class="text-on-surface">New repository</strong></li>
-<li class="flex gap-2">&bull; Name it something like <code class="text-on-surface bg-outline-variant/20 px-1.5 py-0.5 rounded text-xs">my-trooper-site</code> (no spaces)</li>
-<li class="flex gap-2">&bull; Keep it set to <strong class="text-on-surface">Public</strong></li>
-<li class="flex gap-2">&bull; Click <strong class="text-on-surface">Create repository</strong></li>
-</ol>
-</div>
-
-<!-- Step 4 -->
-<div class="border-l-2 border-tertiary pl-5">
-<div class="font-headline font-bold text-sm uppercase mb-2 flex items-center gap-2">
-<span class="w-7 h-7 rounded-full bg-tertiary text-black flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
-Upload Your Files
-</div>
-<ol class="font-body text-sm text-on-surface-variant space-y-2 list-none">
-<li class="flex gap-2">&bull; On your new empty repo page, click <strong class="text-on-surface">uploading an existing file</strong> (the blue link)</li>
-<li class="flex gap-2">&bull; Drag ALL the files and folders from your unzipped folder into the upload area</li>
-<li class="flex gap-2">&bull; Make sure you include the <code class="text-on-surface bg-outline-variant/20 px-1.5 py-0.5 rounded text-xs">public</code> folder too!</li>
-<li class="flex gap-2">&bull; Scroll down and click <strong class="text-on-surface">Commit changes</strong></li>
-</ol>
-</div>
-
-<!-- Step 5 -->
-<div class="border-l-2 border-tertiary pl-5">
-<div class="font-headline font-bold text-sm uppercase mb-2 flex items-center gap-2">
-<span class="w-7 h-7 rounded-full bg-tertiary text-black flex items-center justify-center text-xs font-bold flex-shrink-0">5</span>
-Turn On GitHub Pages
-</div>
-<ol class="font-body text-sm text-on-surface-variant space-y-2 list-none">
-<li class="flex gap-2">&bull; In your repo, click the <strong class="text-on-surface">Settings</strong> tab (gear icon, top of page)</li>
-<li class="flex gap-2">&bull; In the left sidebar, scroll down and click <strong class="text-on-surface">Pages</strong></li>
-<li class="flex gap-2">&bull; Under "Source", select <strong class="text-on-surface">Deploy from a branch</strong></li>
-<li class="flex gap-2">&bull; Under "Branch", change the dropdown from <strong class="text-on-surface">None</strong> to <strong class="text-on-surface">main</strong></li>
-<li class="flex gap-2">&bull; Click <strong class="text-on-surface">Save</strong></li>
-</ol>
-</div>
-
-<!-- Step 6 -->
-<div class="border-l-2 border-tertiary pl-5">
-<div class="font-headline font-bold text-sm uppercase mb-2 flex items-center gap-2">
-<span class="w-7 h-7 rounded-full bg-tertiary text-black flex items-center justify-center text-xs font-bold flex-shrink-0">6</span>
-Wait &amp; Visit Your Site!
-</div>
-<p class="font-body text-sm text-on-surface-variant mb-2">Give it 1-2 minutes, then refresh the Pages settings page. A green banner will appear with your site URL:</p>
-<div class="bg-outline-variant/10 border border-outline-variant/30 rounded-lg p-4">
-<code class="text-on-surface text-sm">https://<span class="text-tertiary">yourusername</span>.github.io/<span class="text-tertiary">my-trooper-site</span>/</code>
-</div>
-<p class="font-body text-xs text-outline mt-2">That's it &mdash; share this link with your garrison!</p>
-</div>
-
-<!-- Troubleshooting -->
-<div class="bg-outline-variant/10 rounded-lg p-5 border border-outline-variant/20 mt-4">
-<div class="font-headline font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-2">
-<span class="material-symbols-outlined text-sm text-tertiary">help</span>
-Troubleshooting
-</div>
-<ul class="font-body text-xs text-on-surface-variant space-y-2">
-<li><strong class="text-on-surface">Site shows a blank page?</strong> Make sure you uploaded <code class="bg-outline-variant/20 px-1 py-0.5 rounded">index.html</code> to the root of the repo, not inside a subfolder.</li>
-<li><strong class="text-on-surface">Images not showing?</strong> Confirm the <code class="bg-outline-variant/20 px-1 py-0.5 rounded">public/</code> folder was uploaded with the images inside it.</li>
-<li><strong class="text-on-surface">Still not working?</strong> Check that GitHub Pages is enabled (Step 5) and wait a few minutes for it to build.</li>
-</ul>
-</div>
-</div>
-<div class="flex justify-start mt-8">
-<button onclick="prevStep()" class="border border-outline-variant/50 text-on-surface px-6 py-3 rounded-lg font-headline font-bold uppercase tracking-wider hover:border-on-surface transition-all flex items-center gap-2">
-<span class="material-symbols-outlined text-sm">arrow_back</span> Back
-</button>
-</div>
-</div>
-</main>
-
-<!-- Footer -->
-<footer class="bg-[#0d0f0c] w-full py-8 border-t border-secondary/30 mt-auto">
-<div class="flex flex-col items-center gap-3 px-8">
-<div class="font-['Plus_Jakarta_Sans'] text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/40">
-Trooper Template Builder
-</div>
-<a href="index.html" class="font-['Plus_Jakarta_Sans'] text-[10px] tracking-[0.2em] uppercase text-tertiary hover:text-on-surface transition-colors">
-&larr; Back to Boba Rearmored
-</a>
-</div>
-</footer>
-
-<script src="builder.js"></script>
+<script>
+function loadExistingConfig() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = function() {
+    const file = input.files[0];
+    if (!file) return;
+    // Store the file content and redirect to builder
+    const reader = new FileReader();
+    reader.onload = function() {
+      try {
+        // Validate it's valid JSON
+        JSON.parse(reader.result);
+        // Store in sessionStorage so the builder can pick it up
+        sessionStorage.setItem('pending-site-config', reader.result);
+        window.location.href = 'builder.html';
+      } catch(e) {
+        alert('That doesn\'t appear to be a valid site-config.json file. Please try again.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+</script>
 </body></html>
