@@ -266,6 +266,10 @@ function selectCostume(key) {
 
 function updateBuilderTheme() {
   const root = document.documentElement;
+  root.style.setProperty('--color-primary', builderState.primary);
+  root.style.setProperty('--color-secondary', builderState.secondary);
+  root.style.setProperty('--color-tertiary', builderState.tertiary);
+  root.style.setProperty('--color-on-surface-variant', deriveOnSurfaceVariant(builderState.primary));
   root.style.setProperty('--builder-primary', builderState.primary);
   root.style.setProperty('--builder-secondary', builderState.secondary);
   root.style.setProperty('--builder-tertiary', builderState.tertiary);
