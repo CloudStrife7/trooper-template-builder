@@ -120,7 +120,7 @@ const builderState = {
   includeTour: true, includeArmory: true,
   images: { hero: null, profile: null, suited: null },
   buildPhotos: [], // Array of { id, label, image: null }
-  troops: [] // Array of { id, date, name, location, notes, status: 'complete'|'upcoming' }
+  troops: [] // Array of { id, date, name, location, notes, photo, status: 'complete'|'upcoming' }
 };
 
 // --- Step Navigation ---
@@ -506,6 +506,7 @@ function addTroop(data) {
     name: (data && data.name) || '',
     location: (data && data.location) || '',
     notes: (data && data.notes) || '',
+    photo: (data && data.photo) || '',
     status: (data && data.status) || 'complete'
   };
   builderState.troops.push(entry);
@@ -551,6 +552,11 @@ function renderTroopSlot(entry) {
           <option value="upcoming"${entry.status === 'upcoming' ? ' selected' : ''}>Upcoming</option>
         </select>
       </div>
+    </div>
+    <div>
+      <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Photo URL (Optional)</label>
+      <input type="text" value="${escHtml(entry.photo)}" data-troop-field="${entry.id}-photo" placeholder="e.g. https://imgur.com/your-troop-photo.jpg"
+        class="w-full bg-surface-container-high border border-outline-variant/30 rounded px-3 py-2 text-sm text-on-surface font-body focus:border-tertiary focus:ring-1 focus:ring-tertiary outline-none transition-colors"/>
     </div>
     <div>
       <label class="font-label text-[10px] text-outline uppercase tracking-widest mb-1 block">Notes (Optional)</label>
@@ -1544,7 +1550,7 @@ function buildSiteConfig() {
     garrison: s.garrison, detachment: s.detachment, squad: s.squad, rank: s.rank,
     bio: s.bio, troopsCompleted: s.troopsCompleted, yearsActive: s.yearsActive, sector: s.sector,
     includeTour: s.includeTour, includeArmory: s.includeArmory,
-    troops: s.troops.map(t => ({ date: t.date, name: t.name, location: t.location, notes: t.notes, status: t.status })),
+    troops: s.troops.map(t => ({ date: t.date, name: t.name, location: t.location, notes: t.notes, photo: t.photo, status: t.status })),
     buildPhotoLabels: s.buildPhotos.map(bp => bp.label),
     // Note: images are stored as files in the ZIP, not in the config JSON (too large for base64)
   };
@@ -1682,32 +1688,20 @@ function generateBBCode() {
   bb += '\n\n';
 
   // Troop log
-  if (completedTroops.length > 0 || upcomingTroops.length > 0) {
+  const allTroops = [...completedTroops.slice().reverse(), ...upcomingTroops];
+  if (allTroops.length > 0) {
     bb += '[b][size=120]Tour of Duty[/size][/b]\n\n';
-  }
-
-  if (upcomingTroops.length > 0) {
-    bb += '[b]Upcoming Deployments:[/b]\n';
-    upcomingTroops.forEach(t => {
-      bb += '• ' + (t.name || 'Upcoming Mission');
-      if (t.date) bb += ' — ' + t.date;
-      if (t.location) bb += ' (' + t.location + ')';
-      if (t.notes) bb += ' — ' + t.notes;
+    allTroops.forEach((t, i) => {
+      bb += '[b]Troop #' + (i + 1) + '[/b]\n';
+      bb += '[b]Date:[/b] ' + (t.date || 'TBD') + '\n';
+      bb += '[b]Name of the event:[/b] ' + (t.name || 'TBD') + '\n';
+      if (t.photo) {
+        bb += '[b]Photo:[/b] [img]' + t.photo + '[/img]\n';
+      } else {
+        bb += '[b]Photo:[/b] N/A\n';
+      }
       bb += '\n';
     });
-    bb += '\n';
-  }
-
-  if (completedTroops.length > 0) {
-    bb += '[b]Completed Missions:[/b]\n';
-    completedTroops.slice().reverse().forEach(t => {
-      bb += '[color=green]✓[/color] ' + (t.name || 'Mission');
-      if (t.date) bb += ' — ' + t.date;
-      if (t.location) bb += ' (' + t.location + ')';
-      if (t.notes) bb += ' — ' + t.notes;
-      bb += '\n';
-    });
-    bb += '\n';
   }
 
   // Images — include Imgur URLs if provided
