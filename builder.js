@@ -8,75 +8,181 @@ const COSTUME_PRESETS = {
     name: "Boba Fett (Re-Armored)", detachment: "Bounty Hunters Guild", prefix: "BH", icon: "rocket_launch",
     primary: "#4C6043", secondary: "#6D0827", tertiary: "#F59E01",
     paintCodes: { primary: "BLK 6530", secondary: "BLK 3062", tertiary: "BLK 1045" },
-    paintNames: { primary: "Storm", secondary: "Cardinal", tertiary: "Melon" }
+    paintNames: { primary: "Storm", secondary: "Cardinal", tertiary: "Melon" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Plus Jakarta Sans", body: "Inter", label: "Space Grotesk" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap",
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+      customCss: ""
+    }
   },
   "stormtrooper": {
     name: "Stormtrooper (ANH)", detachment: "Stormtrooper", prefix: "TK", icon: "shield",
     primary: "#B0B0B0", secondary: "#1A1A1A", tertiary: "#4A90D9",
     paintCodes: null,
-    paintNames: { primary: "Imperial White", secondary: "Joint Black", tertiary: "Corps Blue" }
+    paintNames: { primary: "Imperial White", secondary: "Joint Black", tertiary: "Corps Blue" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Exo 2", body: "Inter", label: "Inter" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap",
+      borderRadius: { DEFAULT: "0rem", lg: "0rem", xl: "0rem", full: "9999px" },
+      customCss: ""
+    }
   },
   "darth-vader": {
     name: "Darth Vader", detachment: "Sith Lord Detachment", prefix: "SL", icon: "psychology",
     primary: "#1A1A2E", secondary: "#8B0000", tertiary: "#C0C0C0",
     paintCodes: null,
-    paintNames: { primary: "Obsidian", secondary: "Sith Red", tertiary: "Imperial Chrome" }
+    paintNames: { primary: "Obsidian", secondary: "Sith Red", tertiary: "Imperial Chrome" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Space Grotesk", body: "Inter", label: "Inter" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap",
+      borderRadius: { DEFAULT: "0rem", lg: "0rem", xl: "0rem", full: "9999px" },
+      customCss: `.hud-scanline { background: linear-gradient(to bottom, transparent 50%, rgba(139,0,0,0.05) 51%, transparent 51%); background-size: 100% 4px; }
+.glow-red { box-shadow: 0 0 20px rgba(139,0,0,0.15); }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0e0e0e; }
+::-webkit-scrollbar-thumb { background: #353534; }
+::-webkit-scrollbar-thumb:hover { background: #8B0000; }`
+    }
   },
   "shoretrooper": {
     name: "Shoretrooper", detachment: "PathFinders", prefix: "ST", icon: "beach_access",
     primary: "#C4956A", secondary: "#3D5A3E", tertiary: "#8B7355",
     paintCodes: null,
-    paintNames: { primary: "Scarif Sand", secondary: "Trooper Olive", tertiary: "Dune" }
+    paintNames: { primary: "Scarif Sand", secondary: "Trooper Olive", tertiary: "Dune" },
+    style: {
+      mode: "light",
+      fonts: { headline: "Fjalla One", body: "Source Sans 3", label: "Source Sans 3" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Fjalla+One&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+      customCss: ""
+    }
   },
   "scout-trooper": {
     name: "Scout Trooper", detachment: "PathFinders", prefix: "TB", icon: "two_wheeler",
     primary: "#D0D0D0", secondary: "#2C2C2C", tertiary: "#6B8E23",
     paintCodes: null,
-    paintNames: { primary: "Shell White", secondary: "Visor Black", tertiary: "Endor" }
+    paintNames: { primary: "Shell White", secondary: "Visor Black", tertiary: "Endor" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Barlow Condensed", body: "Barlow", label: "Barlow" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap",
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "9999px" },
+      customCss: ""
+    }
   },
   "tie-pilot": {
     name: "TIE Pilot", detachment: "Jolly Roger Squadron", prefix: "TI", icon: "flight",
     primary: "#1C1C1C", secondary: "#4169E1", tertiary: "#808080",
     paintCodes: null,
-    paintNames: { primary: "Void Black", secondary: "Imperial Navy", tertiary: "Hull Gray" }
+    paintNames: { primary: "Void Black", secondary: "Imperial Navy", tertiary: "Hull Gray" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Share Tech Mono", body: "Inter", label: "Share Tech Mono" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600&display=swap",
+      borderRadius: { DEFAULT: "0rem", lg: "0rem", xl: "0rem", full: "9999px" },
+      customCss: `.hud-grid { background-image: linear-gradient(rgba(65,105,225,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(65,105,225,0.03) 1px, transparent 1px); background-size: 20px 20px; }`
+    }
   },
   "royal-guard": {
     name: "Emperor's Royal Guard", detachment: "Sovereign Protectors", prefix: "TR", icon: "security",
     primary: "#8B0000", secondary: "#2C0000", tertiary: "#808080",
     paintCodes: null,
-    paintNames: { primary: "Royal Crimson", secondary: "Shadow Maroon", tertiary: "Imperial Gray" }
+    paintNames: { primary: "Royal Crimson", secondary: "Shadow Maroon", tertiary: "Imperial Gray" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Cinzel", body: "EB Garamond", label: "Cinzel" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=EB+Garamond:wght@400;500;600;700&display=swap",
+      borderRadius: { DEFAULT: "0rem", lg: "0rem", xl: "0rem", full: "9999px" },
+      customCss: ""
+    }
   },
   "death-trooper": {
     name: "Death Trooper", detachment: "Spec Ops", prefix: "TX", icon: "skull",
     primary: "#0D0D0D", secondary: "#1A472A", tertiary: "#2F4F2F",
     paintCodes: null,
-    paintNames: { primary: "Death Black", secondary: "Specter Green", tertiary: "Shadow Green" }
+    paintNames: { primary: "Death Black", secondary: "Specter Green", tertiary: "Shadow Green" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Rajdhani", body: "Inter", label: "Rajdhani" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap",
+      borderRadius: { DEFAULT: "0rem", lg: "0rem", xl: "0rem", full: "9999px" },
+      customCss: `.static-noise { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity: 0.02; pointer-events: none; }`
+    }
   },
   "shadow-trooper": {
     name: "Shadow Stormtrooper", detachment: "Spec Ops", prefix: "TX", icon: "visibility_off",
     primary: "#1A1A1A", secondary: "#333333", tertiary: "#505050",
     paintCodes: null,
-    paintNames: { primary: "Shadow Black", secondary: "Stealth Gray", tertiary: "Phantom" }
+    paintNames: { primary: "Shadow Black", secondary: "Stealth Gray", tertiary: "Phantom" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Exo 2", body: "Inter", label: "Exo 2" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap",
+      borderRadius: { DEFAULT: "0rem", lg: "0rem", xl: "0rem", full: "9999px" },
+      customCss: ""
+    }
   },
   "mandalorian": {
     name: "The Mandalorian", detachment: "Bounty Hunters Guild", prefix: "BH", icon: "shield",
     primary: "#6B7B8D", secondary: "#4A3728", tertiary: "#8B7D6B",
     paintCodes: null,
-    paintNames: { primary: "Beskar", secondary: "Mudhorn Brown", tertiary: "Dune Sand" }
+    paintNames: { primary: "Beskar", secondary: "Mudhorn Brown", tertiary: "Dune Sand" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Teko", body: "Work Sans", label: "Teko" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap",
+      borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "9999px" },
+      customCss: ""
+    }
   },
   "clone-501st": {
     name: "Clone Trooper (501st)", detachment: "Clone Trooper", prefix: "CT", icon: "groups",
     primary: "#D0D0D0", secondary: "#1E3A5F", tertiary: "#2C5F8A",
     paintCodes: null,
-    paintNames: { primary: "Clone White", secondary: "501st Blue", tertiary: "Torrent" }
+    paintNames: { primary: "Clone White", secondary: "501st Blue", tertiary: "Torrent" },
+    style: {
+      mode: "dark",
+      fonts: { headline: "Orbitron", body: "Inter", label: "Orbitron" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Inter:wght@400;500;600&display=swap",
+      borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+      customCss: ""
+    }
   },
   "tusken-raider": {
     name: "Tusken Raider", detachment: "Krayt Clan", prefix: "DZ", icon: "landscape",
     primary: "#8B7355", secondary: "#5C4033", tertiary: "#C4A882",
     paintCodes: null,
-    paintNames: { primary: "Dune", secondary: "Bantha Hide", tertiary: "Tatooine Sand" }
+    paintNames: { primary: "Dune", secondary: "Bantha Hide", tertiary: "Tatooine Sand" },
+    style: {
+      mode: "light",
+      fonts: { headline: "Space Grotesk", body: "Work Sans", label: "Work Sans" },
+      googleFontsUrl: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Work+Sans:wght@300;400;500;600&display=swap",
+      borderRadius: { DEFAULT: "0px", lg: "0px", xl: "0px", full: "9999px" },
+      customCss: `.grainy-overlay { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); opacity: 0.04; pointer-events: none; }`
+    }
   }
 };
+
+// --- Style Utilities ---
+const DEFAULT_STYLE = {
+  mode: "dark",
+  fonts: { headline: "Plus Jakarta Sans", body: "Inter", label: "Space Grotesk" },
+  googleFontsUrl: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap",
+  borderRadius: { DEFAULT: "0.125rem", lg: "0.25rem", xl: "0.5rem", full: "0.75rem" },
+  customCss: ""
+};
+
+function getCostumeStyle() {
+  const key = builderState.costume;
+  if (key && key !== 'custom' && COSTUME_PRESETS[key] && COSTUME_PRESETS[key].style) {
+    return COSTUME_PRESETS[key].style;
+  }
+  return DEFAULT_STYLE;
+}
 
 // --- Color Utilities ---
 function hexToRgb(hex) {
@@ -97,6 +203,11 @@ function lightenColor(hex, amount) {
     g + (255 - g) * amount,
     b + (255 - b) * amount
   );
+}
+
+function darkenColor(hex, amount) {
+  const { r, g, b } = hexToRgb(hex);
+  return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
 }
 
 function deriveOnSurfaceVariant(primaryHex) {
@@ -627,7 +738,52 @@ function buildTailwindColors() {
   const p = builderState.primary;
   const s = builderState.secondary;
   const t = builderState.tertiary;
+  const style = getCostumeStyle();
+  const isLight = style.mode === 'light';
   const osv = deriveOnSurfaceVariant(p);
+
+  if (isLight) {
+    // Light-mode surface palette
+    return {
+      "primary": darkenColor(p, 0.25),
+      "on-primary": "#ffffff",
+      "primary-container": p,
+      "secondary": darkenColor(s, 0.2),
+      "on-secondary": "#ffffff",
+      "secondary-container": s,
+      "tertiary": darkenColor(t, 0.15),
+      "on-tertiary": "#ffffff",
+      "tertiary-container": t,
+      "background": "#fff8f4",
+      "surface": "#fff8f4",
+      "surface-dim": "#e6d8cc",
+      "surface-bright": "#fff8f4",
+      "surface-tint": p,
+      "surface-container-lowest": "#ffffff",
+      "surface-container-low": "#fff1e7",
+      "surface-container": "#faebe0",
+      "surface-container-high": "#f4e6da",
+      "surface-container-highest": "#eee0d5",
+      "surface-variant": "#eee0d5",
+      "on-surface": "#211a14",
+      "on-surface-variant": darkenColor(p, 0.5),
+      "on-background": "#211a14",
+      "outline": "#82746c",
+      "outline-variant": "#d4c3b9",
+      "inverse-on-surface": "#fdeee3",
+      "inverse-surface": "#372f28",
+      "inverse-primary": lightenColor(p, 0.4),
+      "error": "#ba1a1a",
+      "on-error": "#ffffff",
+      "error-container": "#ffdad6",
+      "on-error-container": "#93000a",
+      "accent": darkenColor(p, 0.25),
+      "highlight": darkenColor(t, 0.15),
+      "contrast": darkenColor(s, 0.2)
+    };
+  }
+
+  // Dark-mode surface palette (default)
   return {
     "primary": p,
     "on-primary": "#ffffff",
@@ -661,17 +817,20 @@ function buildTailwindColors() {
     "on-error": "#690005",
     "error-container": "#93000a",
     "on-error-container": "#ffdad6",
-    "storm": p,
-    "melon": t,
-    "cardinal": s
+    "accent": p,
+    "highlight": t,
+    "contrast": s
   };
 }
 
 // --- Shared HTML Fragments ---
 function headFragment(title, description, forZip) {
   const colors = buildTailwindColors();
+  const style = getCostumeStyle();
+  const htmlClass = style.mode === 'light' ? 'light' : 'dark';
+  const fontsUrl = style.googleFontsUrl.replace(/&/g, '&amp;');
   return `<!DOCTYPE html>
-<html class="dark" lang="en"><head>
+<html class="${htmlClass}" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>${escHtml(title)}</title>
@@ -680,7 +839,7 @@ function headFragment(title, description, forZip) {
 <meta property="og:description" content="${escHtml(description)}"/>
 <meta property="og:type" content="website"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"><\/script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="${fontsUrl}" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
 tailwind.config = {
@@ -689,11 +848,11 @@ tailwind.config = {
     extend: {
       colors: ${JSON.stringify(colors, null, 2)},
       fontFamily: {
-        "headline": ["Plus Jakarta Sans"],
-        "body": ["Inter"],
-        "label": ["Space Grotesk"]
+        "headline": ["${style.fonts.headline}"],
+        "body": ["${style.fonts.body}"],
+        "label": ["${style.fonts.label}"]
       },
-      borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+      borderRadius: ${JSON.stringify(style.borderRadius)},
     },
   },
 }
@@ -702,11 +861,19 @@ tailwind.config = {
 
 function styleFragment(heroImg, forZip) {
   const src = heroImg || 'public/images/hero-bg.jpg';
+  const style = getCostumeStyle();
+  const isLight = style.mode === 'light';
+  const bgColor = isLight ? '#fff8f4' : '#131411';
+  const textColor = isLight ? '#211a14' : '#e4e2de';
+  const meshOverlay = isLight
+    ? `background-image: linear-gradient(to bottom, rgba(255, 248, 244, 0.85), rgba(255, 248, 244, 1)), url('${src}');`
+    : `background-image: linear-gradient(to bottom, rgba(19, 20, 17, 0.8), rgba(19, 20, 17, 1)), url('${src}');`;
+  const customCss = style.customCss || '';
   return `<style>
 .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
-body { background-color: #131411; color: #e4e2de; font-family: 'Inter', sans-serif; }
-.bg-fett-mesh {
-  background-image: linear-gradient(to bottom, rgba(19, 20, 17, 0.8), rgba(19, 20, 17, 1)), url('${src}');
+body { background-color: ${bgColor}; color: ${textColor}; font-family: '${style.fonts.body}', sans-serif; }
+.bg-hero-mesh {
+  ${meshOverlay}
   background-size: cover; background-position: center;
 }
 .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; }
@@ -714,6 +881,7 @@ body { background-color: #131411; color: #e4e2de; font-family: 'Inter', sans-ser
 @keyframes slideInFromLeft { from { transform: translateX(-30%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes slideOutToLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-30%); opacity: 0; } }
 @keyframes slideOutToRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(30%); opacity: 0; } }
+${customCss}
 </style>`;
 }
 
@@ -792,7 +960,7 @@ function generateIndex(forZip) {
   return `${headFragment(s.siteName + ' // ' + s.designation, 'The official trooping log of ' + s.designation + '.', forZip)}
 ${styleFragment(heroSrc, forZip)}
 </head>
-<body class="bg-background text-on-background font-body selection:bg-storm selection:text-white min-h-screen flex flex-col">
+<body class="bg-background text-on-background font-body selection:bg-accent selection:text-white min-h-screen flex flex-col">
 ${nav.topNav}
 <main class="flex-grow pt-16">
 <!-- Hero Section -->
@@ -800,7 +968,7 @@ ${nav.topNav}
 <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
 <div id="hero-overlay" class="absolute inset-0 bg-cover bg-center opacity-[0.18]" style="background-image: url('${heroSrc}'); mask-image: radial-gradient(circle at center, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);"></div>
 </div>
-<div class="absolute inset-0 z-0 bg-fett-mesh opacity-50"></div>
+<div class="absolute inset-0 z-0 bg-hero-mesh opacity-50"></div>
 <div class="relative z-10 w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
 <div class="flex-1 space-y-6">
 <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary text-white rounded-sm border-l-4 border-tertiary">
