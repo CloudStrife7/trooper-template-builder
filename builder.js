@@ -661,9 +661,9 @@ function buildTailwindColors() {
     "on-error": "#690005",
     "error-container": "#93000a",
     "on-error-container": "#ffdad6",
-    "storm": p,
-    "melon": t,
-    "cardinal": s
+    "accent": p,
+    "highlight": t,
+    "contrast": s
   };
 }
 
@@ -705,7 +705,7 @@ function styleFragment(heroImg, forZip) {
   return `<style>
 .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
 body { background-color: #131411; color: #e4e2de; font-family: 'Inter', sans-serif; }
-.bg-fett-mesh {
+.bg-hero-mesh {
   background-image: linear-gradient(to bottom, rgba(19, 20, 17, 0.8), rgba(19, 20, 17, 1)), url('${src}');
   background-size: cover; background-position: center;
 }
@@ -792,7 +792,7 @@ function generateIndex(forZip) {
   return `${headFragment(s.siteName + ' // ' + s.designation, 'The official trooping log of ' + s.designation + '.', forZip)}
 ${styleFragment(heroSrc, forZip)}
 </head>
-<body class="bg-background text-on-background font-body selection:bg-storm selection:text-white min-h-screen flex flex-col">
+<body class="bg-background text-on-background font-body selection:bg-accent selection:text-white min-h-screen flex flex-col">
 ${nav.topNav}
 <main class="flex-grow pt-16">
 <!-- Hero Section -->
@@ -800,7 +800,7 @@ ${nav.topNav}
 <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
 <div id="hero-overlay" class="absolute inset-0 bg-cover bg-center opacity-[0.18]" style="background-image: url('${heroSrc}'); mask-image: radial-gradient(circle at center, black 30%, transparent 80%); -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);"></div>
 </div>
-<div class="absolute inset-0 z-0 bg-fett-mesh opacity-50"></div>
+<div class="absolute inset-0 z-0 bg-hero-mesh opacity-50"></div>
 <div class="relative z-10 w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
 <div class="flex-1 space-y-6">
 <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary text-white rounded-sm border-l-4 border-tertiary">
