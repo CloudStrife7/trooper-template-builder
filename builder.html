@@ -38,17 +38,35 @@ tailwind.config = {
 }
 </script>
 <style>
+@property --color-primary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #B0B0B0;
+}
+@property --color-secondary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1A1A1A;
+}
+@property --color-tertiary {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #4A90D9;
+}
+@property --color-on-surface-variant {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #c8c8c8;
+}
 :root {
   --color-primary: #B0B0B0;
   --color-secondary: #1A1A1A;
   --color-tertiary: #4A90D9;
   --color-on-surface-variant: #c8c8c8;
+  transition: --color-primary 0.6s ease, --color-secondary 0.6s ease, --color-tertiary 0.6s ease, --color-on-surface-variant 0.6s ease;
 }
 .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
 body { background-color: #131411; color: #e4e2de; font-family: 'Inter', sans-serif; }
-*, *::before, *::after {
-  transition: color 0.5s ease, background-color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, outline-color 0.5s ease;
-}
 input[type="color"] { -webkit-appearance: none; border: none; }
 input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
 input[type="color"]::-webkit-color-swatch { border: 1px solid #444840; border-radius: 4px; }
