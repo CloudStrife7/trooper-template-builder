@@ -176,12 +176,87 @@ const DEFAULT_STYLE = {
   customCss: ""
 };
 
+// --- Font Presets ---
+const FONT_PRESETS = {
+  "costume-default": {
+    name: "Match Costume",
+    description: "Use the fonts that come with your costume",
+    fonts: null,
+    googleFontsUrl: null
+  },
+  "tactical": {
+    name: "Tactical",
+    description: "Clean and modern military tech",
+    fonts: { headline: "Plus Jakarta Sans", body: "Inter", label: "Space Grotesk" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap"
+  },
+  "military": {
+    name: "Military",
+    description: "Bold and authoritative",
+    fonts: { headline: "Exo 2", body: "Inter", label: "Inter" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+  },
+  "elegant": {
+    name: "Elegant",
+    description: "Classic serif styling",
+    fonts: { headline: "Cinzel", body: "EB Garamond", label: "Cinzel" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=EB+Garamond:wght@400;500;600;700&display=swap"
+  },
+  "terminal": {
+    name: "Terminal",
+    description: "HUD / data terminal feel",
+    fonts: { headline: "Share Tech Mono", body: "Inter", label: "Share Tech Mono" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600&display=swap"
+  },
+  "compact": {
+    name: "Compact",
+    description: "Tight and efficient",
+    fonts: { headline: "Barlow Condensed", body: "Barlow", label: "Barlow" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap"
+  },
+  "warrior": {
+    name: "Warrior",
+    description: "Big and impactful",
+    fonts: { headline: "Teko", body: "Work Sans", label: "Teko" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap"
+  },
+  "sci-fi": {
+    name: "Sci-Fi",
+    description: "Futuristic and digital",
+    fonts: { headline: "Orbitron", body: "Inter", label: "Orbitron" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"
+  },
+  "stealth": {
+    name: "Stealth",
+    description: "Angular and aggressive",
+    fonts: { headline: "Rajdhani", body: "Inter", label: "Rajdhani" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+  },
+  "rugged": {
+    name: "Rugged",
+    description: "Earthy and natural",
+    fonts: { headline: "Fjalla One", body: "Source Sans 3", label: "Source Sans 3" },
+    googleFontsUrl: "https://fonts.googleapis.com/css2?family=Fjalla+One&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+  }
+};
+
 function getCostumeStyle() {
   const key = builderState.costume;
+  let style;
   if (key && key !== 'custom' && COSTUME_PRESETS[key] && COSTUME_PRESETS[key].style) {
-    return COSTUME_PRESETS[key].style;
+    style = { ...COSTUME_PRESETS[key].style };
+  } else {
+    style = { ...DEFAULT_STYLE };
   }
-  return DEFAULT_STYLE;
+
+  // Override fonts if user selected a font preset other than costume-default
+  const fontKey = builderState.fontPreset;
+  if (fontKey && fontKey !== 'costume-default' && FONT_PRESETS[fontKey] && FONT_PRESETS[fontKey].fonts) {
+    style.fonts = { ...FONT_PRESETS[fontKey].fonts };
+    style.googleFontsUrl = FONT_PRESETS[fontKey].googleFontsUrl;
+  }
+
+  return style;
 }
 
 // --- Color Utilities ---
@@ -222,6 +297,7 @@ function deriveSurfaceTint(primaryHex) {
 // --- Builder State ---
 const builderState = {
   costume: null,
+  fontPreset: 'costume-default',
   primary: '', secondary: '', tertiary: '',
   paintNames: { primary: '', secondary: '', tertiary: '' },
   paintCodes: null,
@@ -329,6 +405,68 @@ function renderCostumeGrid() {
     customCard.querySelector('#' + id).addEventListener('input', () => selectCostume('custom'));
   });
   grid.appendChild(customCard);
+}
+
+// --- Font Selection ---
+function renderFontSelector() {
+  const grid = document.getElementById('font-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  // Preload all font families so previews render correctly
+  const loadedUrls = new Set(
+    Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(l => l.href)
+  );
+  Object.values(FONT_PRESETS).forEach(p => {
+    if (p.googleFontsUrl && !loadedUrls.has(p.googleFontsUrl)) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = p.googleFontsUrl;
+      document.head.appendChild(link);
+      loadedUrls.add(p.googleFontsUrl);
+    }
+  });
+
+  Object.entries(FONT_PRESETS).forEach(([key, preset]) => {
+    const card = document.createElement('div');
+    card.className = 'font-card cursor-pointer border border-outline-variant/30 hover:border-on-surface/50 transition-all p-4 rounded-lg group';
+    card.dataset.fontPreset = key;
+
+    if (key === 'costume-default') {
+      card.innerHTML = `
+        <div class="flex items-center gap-2 mb-1">
+          <span class="material-symbols-outlined text-lg text-outline group-hover:text-on-surface transition-colors">auto_awesome</span>
+          <div class="font-headline font-bold text-sm uppercase tracking-tight">${preset.name}</div>
+        </div>
+        <div class="font-body text-xs text-on-surface-variant">${preset.description}</div>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="font-bold text-sm uppercase tracking-tight mb-1 truncate" style="font-family: '${preset.fonts.headline}', sans-serif;">${preset.name}</div>
+        <div class="text-xs text-on-surface-variant mb-1.5" style="font-family: '${preset.fonts.body}', sans-serif;">Aa Bb Cc 123</div>
+        <div class="text-[10px] text-outline uppercase tracking-widest truncate" style="font-family: '${preset.fonts.label}', sans-serif;">${preset.fonts.headline}</div>
+      `;
+    }
+
+    card.onclick = () => selectFontPreset(key);
+    grid.appendChild(card);
+  });
+
+  // Select the current font preset
+  selectFontPreset(builderState.fontPreset || 'costume-default');
+}
+
+function selectFontPreset(key) {
+  document.querySelectorAll('.font-card').forEach(c => {
+    c.classList.remove('border-tertiary', 'border-2');
+    c.classList.add('border-outline-variant/30');
+  });
+  const card = document.querySelector(`[data-font-preset="${key}"]`);
+  if (card) {
+    card.classList.add('border-tertiary', 'border-2');
+    card.classList.remove('border-outline-variant/30');
+  }
+  builderState.fontPreset = key;
 }
 
 function selectCostume(key) {
@@ -1720,6 +1858,7 @@ function buildSiteConfig() {
   return {
     version: 1,
     costume: s.costume,
+    fontPreset: s.fontPreset || 'costume-default',
     primary: s.primary, secondary: s.secondary, tertiary: s.tertiary,
     paintNames: s.paintNames, paintCodes: s.paintCodes,
     siteName: s.siteName, designation: s.designation,
@@ -1756,6 +1895,13 @@ function loadSiteConfig(configJson) {
     if (c.paintNames) builderState.paintNames = c.paintNames;
     if (c.paintCodes !== undefined) builderState.paintCodes = c.paintCodes;
     updateBuilderTheme();
+
+    // Restore font preset
+    if (c.fontPreset && FONT_PRESETS[c.fontPreset]) {
+      selectFontPreset(c.fontPreset);
+    } else {
+      selectFontPreset('costume-default');
+    }
 
     // Restore form fields
     const fieldMap = {
@@ -1936,6 +2082,7 @@ function copyBBCode() {
 // --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
   renderCostumeGrid();
+  renderFontSelector();
   setupImageSlots();
   initBuildPhotos();
   showStep(1);
